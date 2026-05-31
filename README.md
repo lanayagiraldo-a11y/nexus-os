@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 🧠 NEXUS OS
 
-First, run the development server:
+### Tu centro de comando de IA personal — Mission Control para múltiples agentes
+
+Habla con **Claude, ChatGPT y Gemini** desde un solo dashboard, con voz, y guarda todo automáticamente en tu bóveda de Obsidian.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8) ![TypeScript](https://img.shields.io/badge/TypeScript-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+
+</div>
+
+---
+
+## ✨ Qué hace
+
+- 💬 **Chat con 4 agentes de IA** — Claude, ChatGPT, Gemini y un agente local opcional (Hermes)
+- 🎤 **Hablar con voz** — dicta en lugar de escribir (usa el reconocimiento del navegador, sin API extra)
+- 🧠 **Memoria en Obsidian** — cada chat, meta y entrada de diario se guarda solo en tu bóveda
+- 🎯 **Goals & Journal** — trackea objetivos y escribe tu diario, sincronizado con Obsidian
+- 📡 **Activity Feed en vivo** — ve en tiempo real cada respuesta de los agentes y cada guardado
+- ⌘ **Command Palette** — navega todo con `⌘K` sin tocar el mouse
+
+---
+
+## 🚀 Instalación
+
+Necesitas [Node.js](https://nodejs.org) 18+ instalado.
 
 ```bash
+# 1. Clona el repositorio
+git clone https://github.com/TU_USUARIO/nexus-os.git
+cd nexus-os
+
+# 2. Instala las dependencias
+npm install
+
+# 3. Configura tus claves
+cp .env.example .env.local
+#    luego abre .env.local y pega TUS propias claves de API
+
+# 4. Arranca
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre **http://localhost:3000** y listo. 🎉
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔑 Claves que necesitas
 
-## Learn More
+Cada quien usa **sus propias claves** (gratis o de pago según el proveedor). Las pones en `.env.local`:
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Dónde conseguirla |
+|----------|-------------------|
+| `OPENAI_API_KEY` | https://platform.openai.com/api-keys |
+| `GEMINI_API_KEY` | https://aistudio.google.com/apikey |
+| `CLAUDE_API_KEY` | https://console.anthropic.com/settings/keys |
+| `OBSIDIAN_VAULT_PATH` | La ruta a tu carpeta de Obsidian |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> 🔒 **Tus claves son tuyas.** El archivo `.env.local` está en `.gitignore` — nunca se sube a GitHub. Quien clone este repo debe poner las suyas.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+No necesitas todas: el dashboard funciona con las que configures, y los agentes sin clave aparecen como *offline*.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 · React · Tailwind CSS v4 · Framer Motion · TypeScript
+
+---
+
+## 📄 Licencia
+
+MIT — úsalo, modifícalo y compártelo libremente.

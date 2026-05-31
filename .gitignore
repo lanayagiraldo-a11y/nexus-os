@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Notas internas de Liliana (NO publicar — contienen fragmentos de claves e IP del VPS)
+MEMORIA-SESION.md
+CODIGO-FUENTE.md
+NEXUS-OS-MEMORIA.html
+.claude/
