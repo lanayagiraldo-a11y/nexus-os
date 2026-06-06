@@ -24,6 +24,7 @@ body { height: 100%; overflow: hidden; background: radial-gradient(circle at 12%
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(109,40,217,0.42); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(139,28,246,0.62); }
+nextjs-portal { display: none !important; pointer-events: none !important; }
 .glass { background: rgba(255,255,255,0.76); backdrop-filter: blur(24px) saturate(1.28); -webkit-backdrop-filter: blur(24px) saturate(1.28); border: 1px solid rgba(109,40,217,0.14); box-shadow: 0 24px 74px rgba(109,40,217,0.18), 0 12px 34px rgba(7,24,46,0.10); }
 .grid-bg { background-image: linear-gradient(rgba(109,40,217,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(139,28,246,0.05) 1px, transparent 1px); background-size: 44px 44px; }
 .dot-active { background:#00A676; box-shadow:0 0 0 0 rgba(0,166,118,0.4); animation: pulse-emerald 2s infinite; }
