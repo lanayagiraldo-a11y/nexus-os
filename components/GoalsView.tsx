@@ -91,31 +91,31 @@ export default function GoalsView() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-6 rounded-full" style={{ background: "#22d3ee" }} />
+          <div className="w-1 h-6 rounded-full" style={{ background: "#6D28D9" }} />
           <div>
-            <h1 className="text-2xl font-black" style={{ fontFamily: "var(--font-syne)", color: "#e2e8f0" }}>Goals</h1>
-            <p className="text-[12px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.5)" }}>
+            <h1 className="text-2xl font-black" style={{ fontFamily: "var(--font-syne)", color: "#07182E" }}>Goals</h1>
+            <p className="text-[12px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.5)" }}>
               {done}/{goals.length} completados · {pct}%
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {obsidianOk === true && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)" }}>
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#34d399" }} />
-              <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "#34d399" }}>Obsidian</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(0,166,118,0.1)", border: "1px solid rgba(0,166,118,0.2)" }}>
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#00A676" }} />
+              <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "#00A676" }}>Obsidian</span>
             </div>
           )}
           {obsidianOk === false && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)" }}>
-              <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "#fbbf24" }}>Set OBSIDIAN_VAULT_PATH</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(109,40,217,0.1)", border: "1px solid rgba(109,40,217,0.2)" }}>
+              <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "#6D28D9" }}>Set OBSIDIAN_VAULT_PATH</span>
             </div>
           )}
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={saveToObsidian} disabled={saving}
             className="flex items-center gap-2 px-3 py-2 rounded-lg"
-            style={{ background: saved ? "rgba(52,211,153,0.15)" : "rgba(34,211,238,0.08)", border: saved ? "1px solid rgba(52,211,153,0.3)" : "1px solid rgba(34,211,238,0.2)", cursor: "pointer" }}>
-            <Save size={13} style={{ color: saved ? "#34d399" : "#22d3ee" }} />
-            <span className="text-[11px] font-semibold" style={{ fontFamily: "var(--font-syne)", color: saved ? "#34d399" : "#22d3ee" }}>
+            style={{ background: saved ? "rgba(0,166,118,0.15)" : "rgba(109,40,217,0.08)", border: saved ? "1px solid rgba(0,166,118,0.3)" : "1px solid rgba(109,40,217,0.2)", cursor: "pointer" }}>
+            <Save size={13} style={{ color: saved ? "#00A676" : "#6D28D9" }} />
+            <span className="text-[11px] font-semibold" style={{ fontFamily: "var(--font-syne)", color: saved ? "#00A676" : "#6D28D9" }}>
               {saved ? "¡Guardado!" : saving ? "Guardando…" : "Guardar en Obsidian"}
             </span>
           </motion.button>
@@ -125,13 +125,13 @@ export default function GoalsView() {
       {/* Progress bar */}
       {goals.length > 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl p-4"
-          style={{ background: "rgba(34,211,238,0.04)", border: "1px solid rgba(34,211,238,0.1)" }}>
+          style={{ background: "rgba(109,40,217,0.04)", border: "1px solid rgba(109,40,217,0.1)" }}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.5)" }}>Progreso total</span>
-            <span className="text-[13px] font-bold" style={{ fontFamily: "var(--font-jetbrains)", color: "#22d3ee" }}>{pct}%</span>
+            <span className="text-[11px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.5)" }}>Progreso total</span>
+            <span className="text-[13px] font-bold" style={{ fontFamily: "var(--font-jetbrains)", color: "#6D28D9" }}>{pct}%</span>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(34,211,238,0.1)" }}>
-            <motion.div className="h-full rounded-full" style={{ background: "linear-gradient(90deg,#22d3ee,#a78bfa)" }}
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(109,40,217,0.1)" }}>
+            <motion.div className="h-full rounded-full" style={{ background: "linear-gradient(90deg,#6D28D9,#F72585)" }}
               initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, ease: "easeOut" }} />
           </div>
         </motion.div>
@@ -142,8 +142,8 @@ export default function GoalsView() {
         <AnimatePresence>
           {goals.length === 0 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-32 gap-3">
-              <Target size={32} style={{ color: "rgba(34,211,238,0.2)" }} />
-              <p className="text-sm" style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.4)" }}>
+              <Target size={32} style={{ color: "rgba(109,40,217,0.2)" }} />
+              <p className="text-sm" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.4)" }}>
                 Sin metas aún — agrega tu primera
               </p>
             </motion.div>
@@ -152,19 +152,19 @@ export default function GoalsView() {
             <motion.div key={goal.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
               transition={{ delay: i * 0.04 }}
               className="flex items-center gap-3 p-3.5 rounded-xl group"
-              style={{ background: goal.done ? "rgba(52,211,153,0.05)" : "rgba(255,255,255,0.03)", border: goal.done ? "1px solid rgba(52,211,153,0.15)" : "1px solid rgba(255,255,255,0.06)" }}>
+              style={{ background: goal.done ? "rgba(0,166,118,0.05)" : "rgba(7,24,46,0.03)", border: goal.done ? "1px solid rgba(0,166,118,0.15)" : "1px solid rgba(7,24,46,0.06)" }}>
               <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => toggleGoal(goal.id)}
                 className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: goal.done ? "#34d399" : "rgba(255,255,255,0.06)", border: goal.done ? "none" : "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
-                {goal.done && <Check size={13} style={{ color: "#020409" }} strokeWidth={3} />}
+                style={{ background: goal.done ? "#00A676" : "rgba(7,24,46,0.06)", border: goal.done ? "none" : "1px solid rgba(7,24,46,0.12)", cursor: "pointer" }}>
+                {goal.done && <Check size={13} style={{ color: "#F7EFE2" }} strokeWidth={3} />}
               </motion.button>
               <span className="flex-1 text-sm leading-relaxed"
-                style={{ fontFamily: "var(--font-outfit)", color: goal.done ? "rgba(148,163,184,0.5)" : "rgba(226,232,240,0.85)", textDecoration: goal.done ? "line-through" : "none" }}>
+                style={{ fontFamily: "var(--font-outfit)", color: goal.done ? "rgba(31,41,55,0.5)" : "rgba(226,232,240,0.85)", textDecoration: goal.done ? "line-through" : "none" }}>
                 {goal.text}
               </span>
               <motion.button initial={{ opacity: 0 }} whileHover={{ opacity: 1, scale: 1.1 }} className="opacity-0 group-hover:opacity-100 p-1 rounded"
                 style={{ cursor: "pointer", background: "none", border: "none" }} onClick={() => deleteGoal(goal.id)}>
-                <Trash2 size={13} style={{ color: "rgba(251,113,133,0.5)" }} />
+                <Trash2 size={13} style={{ color: "rgba(239,68,68,0.5)" }} />
               </motion.button>
             </motion.div>
           ))}
@@ -173,25 +173,25 @@ export default function GoalsView() {
 
       {/* Input */}
       <div className="flex items-center gap-2 p-3 rounded-xl"
-        style={{ background: "rgba(13,20,40,0.9)", border: "1px solid rgba(34,211,238,0.2)" }}>
+        style={{ background: "rgba(13,20,40,0.9)", border: "1px solid rgba(109,40,217,0.2)" }}>
         <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addGoal()}
           placeholder="Nueva meta… (Enter para agregar)"
           className="flex-1 bg-transparent focus:outline-none text-sm"
-          style={{ fontFamily: "var(--font-outfit)", color: "#e2e8f0" }} />
+          style={{ fontFamily: "var(--font-outfit)", color: "#07182E" }} />
         {voiceSupported && (
           <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={startVoice}
             className="w-8 h-8 flex items-center justify-center rounded-lg"
-            style={{ background: voiceState === "listening" ? "rgba(251,113,133,0.15)" : "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}>
+            style={{ background: voiceState === "listening" ? "rgba(239,68,68,0.15)" : "rgba(7,24,46,0.05)", border: "1px solid rgba(7,24,46,0.08)", cursor: "pointer" }}>
             {voiceState === "listening"
-              ? <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.8, repeat: Infinity }}><Mic size={13} style={{ color: "#fb7185" }} /></motion.div>
-              : <MicOff size={13} style={{ color: "rgba(148,163,184,0.4)" }} />}
+              ? <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.8, repeat: Infinity }}><Mic size={13} style={{ color: "#EF4444" }} /></motion.div>
+              : <MicOff size={13} style={{ color: "rgba(31,41,55,0.4)" }} />}
           </motion.button>
         )}
         <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={addGoal}
           className="w-8 h-8 flex items-center justify-center rounded-lg"
-          style={{ background: input.trim() ? "#22d3ee" : "rgba(34,211,238,0.1)", border: "none", cursor: input.trim() ? "pointer" : "default" }}>
-          <Plus size={15} style={{ color: input.trim() ? "#020409" : "rgba(34,211,238,0.3)" }} />
+          style={{ background: input.trim() ? "#6D28D9" : "rgba(109,40,217,0.1)", border: "none", cursor: input.trim() ? "pointer" : "default" }}>
+          <Plus size={15} style={{ color: input.trim() ? "#F7EFE2" : "rgba(109,40,217,0.3)" }} />
         </motion.button>
       </div>
     </div>

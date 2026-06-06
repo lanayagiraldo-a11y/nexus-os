@@ -20,9 +20,9 @@ export default function NeuralBackground() {
         if (p.y<0) p.y=canvas.height; if (p.y>canvas.height) p.y=0;
         const op = p.opacity*(0.6+0.4*Math.sin(p.pulse));
         const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.radius*3);
-        g.addColorStop(0,`rgba(34,211,238,${op})`); g.addColorStop(1,"rgba(34,211,238,0)");
+        g.addColorStop(0,`rgba(109,40,217,${op})`); g.addColorStop(1,"rgba(109,40,217,0)");
         ctx.beginPath(); ctx.arc(p.x,p.y,p.radius*3,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle=`rgba(34,211,238,${op*1.5})`; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle=`rgba(109,40,217,${op*1.5})`; ctx.fill();
       }
       const maxDist=120;
       for (let i=0;i<particles.length;i++) for (let j=i+1;j<particles.length;j++) {
@@ -30,7 +30,7 @@ export default function NeuralBackground() {
         if (dist<maxDist) {
           const s=1-dist/maxDist,op=s*0.12;
           const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
-          g.addColorStop(0,`rgba(34,211,238,${op})`); g.addColorStop(0.5,`rgba(167,139,250,${op*0.8})`); g.addColorStop(1,`rgba(34,211,238,${op})`);
+          g.addColorStop(0,`rgba(109,40,217,${op})`); g.addColorStop(0.5,`rgba(247,37,133,${op*0.8})`); g.addColorStop(1,`rgba(109,40,217,${op})`);
           ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.strokeStyle=g; ctx.lineWidth=s*0.8; ctx.stroke();
         }
       }

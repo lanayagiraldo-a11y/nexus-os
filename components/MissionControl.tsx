@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Target, BookOpen, Database, ChevronRight } from "lucide-react";
+import { Target, BookOpen, Database, ChevronRight, Inbox, Megaphone, Video, Workflow, Network, SunMedium, BrainCircuit } from "lucide-react";
 import AgentAvatar from "./AgentAvatar";
 import { PROVIDERS } from "@/lib/providers";
 import type { ProviderId, ProviderDef } from "@/lib/providers";
@@ -14,9 +14,9 @@ interface AgentHealth {
 }
 
 const STATUS: Record<AgentStatus, { color: string; label: string }> = {
-  LIVE:     { color: "#34d399", label: "Online" },
-  OFFLINE:  { color: "#fb7185", label: "Offline" },
-  CHECKING: { color: "#60a5fa", label: "Verificando…" },
+  LIVE:     { color: "#00A676", label: "Online" },
+  OFFLINE:  { color: "#EF4444", label: "Offline" },
+  CHECKING: { color: "#5F8C94", label: "Verificando…" },
 };
 
 // Para qué usa Liliana cada agente
@@ -24,11 +24,11 @@ const ROLE: Record<ProviderId, { title: string; uses: string[] }> = {
   claude:  { title: "Finanzas · Estrategia · Código",   uses: ["Análisis financiero y NIIF", "Estrategia empresarial", "Redacción legal y formal"] },
   openai:  { title: "Marketing · Contenido · Emails",   uses: ["Copys y campañas Buzzi", "Emails profesionales", "Ideas creativas y resúmenes"] },
   gemini:  { title: "Research · Búsqueda en tiempo real", uses: ["Comparativos y benchmarks", "Noticias y tendencias", "Datos de mercado actualizados"] },
-  hermes:  { title: "Tareas privadas · Sin nube",        uses: ["Análisis confidenciales", "Documentos sensibles", "Sin registro externo"] },
+  hermes:  { title: "Segundo cerebro · Obsidian · Herramientas", uses: ["Memoria y contexto personal", "Archivos y Obsidian", "Automatizaciones con herramientas"] },
 };
 
 const ACCENT: Record<ProviderId, string> = {
-  claude: "#a78bfa", openai: "#34d399", gemini: "#60a5fa", hermes: "#fbbf24",
+  claude: "#F72585", openai: "#00A676", gemini: "#5F8C94", hermes: "#6D28D9",
 };
 
 function AgentCard({ prov, health, index, onOpen }: {
@@ -43,11 +43,11 @@ function AgentCard({ prov, health, index, onOpen }: {
 
   return (
     <motion.div
-      initial={{ y: 20, opacity: 0 }}
+      initial={false}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: index * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="relative flex flex-col rounded-2xl overflow-hidden"
-      style={{ background: "rgba(8,14,31,0.9)", border: `1px solid rgba(${rgb},0.15)`, backdropFilter: "blur(16px)" }}
+      style={{ background: "rgba(247,239,226,0.9)", border: `1px solid rgba(${rgb},0.15)`, backdropFilter: "blur(16px)" }}
       whileHover={{ y: -2, borderColor: `rgba(${rgb},0.35)`, boxShadow: `0 12px 40px rgba(${rgb},0.1)` }}
     >
       <div className="absolute inset-0 pointer-events-none"
@@ -62,7 +62,7 @@ function AgentCard({ prov, health, index, onOpen }: {
               <h3 className="text-lg font-black leading-tight" style={{ fontFamily: "var(--font-syne)", color: accent }}>
                 {prov.name}
               </h3>
-              <p className="text-[11px] mt-0.5" style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.55)" }}>
+              <p className="text-[11px] mt-0.5" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.55)" }}>
                 {role.title}
               </p>
             </div>
@@ -84,7 +84,7 @@ function AgentCard({ prov, health, index, onOpen }: {
           {role.uses.map(u => (
             <li key={u} className="flex items-start gap-2">
               <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background: `rgba(${rgb},0.6)` }} />
-              <span className="text-[12px] leading-snug" style={{ fontFamily: "var(--font-outfit)", color: "rgba(203,213,225,0.75)" }}>
+              <span className="text-[12px] leading-snug" style={{ fontFamily: "var(--font-outfit)", color: "rgba(7,24,46,0.75)" }}>
                 {u}
               </span>
             </li>
@@ -105,13 +105,13 @@ function AgentCard({ prov, health, index, onOpen }: {
           </motion.button>
         ) : (
           <div className="px-4 py-2.5 rounded-xl mt-1"
-            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            style={{ background: "rgba(7,24,46,0.02)", border: "1px solid rgba(7,24,46,0.06)" }}>
             <span className="text-[11px]"
-              style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.35)" }}>
+              style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.35)" }}>
               {!health.configured
                 ? `Agrega ${prov.envKey} en .env.local`
                 : id === "hermes"
-                ? "Instala Ollama en el VPS para activar"
+                ? "Verifica Ollama/Hermes en el VPS"
                 : "Verifica la API key"}
             </span>
           </div>
@@ -127,7 +127,7 @@ function SelfTile({ icon: Icon, label, description, color, rgb, delay, onClick }
 }) {
   return (
     <motion.button
-      initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+      initial={false} animate={{ y: 0, opacity: 1 }}
       transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       onClick={onClick}
       className="flex items-center gap-3 p-4 rounded-xl text-left w-full"
@@ -141,7 +141,7 @@ function SelfTile({ icon: Icon, label, description, color, rgb, delay, onClick }
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-bold" style={{ fontFamily: "var(--font-syne)", color }}>{label}</div>
-        <div className="text-[11px] mt-0.5 truncate" style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.5)" }}>{description}</div>
+        <div className="text-[11px] mt-0.5 truncate" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.5)" }}>{description}</div>
       </div>
       <ChevronRight size={13} style={{ color: `rgba(${rgb},0.4)` }} />
     </motion.button>
@@ -185,36 +185,59 @@ export default function MissionControl({ onOpenAgent, onNavigate }: MissionContr
   const greeting = hour < 12 ? "Buenos días" : hour < 18 ? "Buenas tardes" : "Buenas noches";
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="p-6 flex flex-col gap-6">
+    <div className="flex flex-col h-full overflow-y-auto overscroll-contain">
+      <div className="p-4 sm:p-5 lg:p-6 pb-24 md:pb-6 flex flex-col gap-5 sm:gap-6">
+
+        <div className="flex items-center gap-3 -mb-1">
+          <div className="w-1 h-4 rounded-full" style={{ background: "#6D28D9" }} />
+          <span className="text-[10px] font-semibold tracking-[0.18em] uppercase"
+            style={{ fontFamily: "var(--font-syne)", color: "#6D28D9" }}>
+            Command Center
+          </span>
+          <div className="flex-1 h-px" style={{ background: "rgba(109,40,217,0.1)" }} />
+        </div>
 
         {/* Saludo + estado global */}
-        <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="flex items-end justify-between">
+        <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-black tracking-tight"
-              style={{ fontFamily: "var(--font-syne)", color: "#e2e8f0", letterSpacing: "-0.02em" }}>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight"
+              style={{ fontFamily: "var(--font-syne)", color: "#07182E", letterSpacing: "-0.02em" }}>
               {greeting}, Liliana 👋
             </h1>
             <p className="text-[13px] mt-1"
-              style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.5)" }}>
+              style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.5)" }}>
               {liveCount === 0 ? "Configurando agentes…" : `${liveCount} agente${liveCount > 1 ? "s" : ""} listo${liveCount > 1 ? "s" : ""} para trabajar`}
             </p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-            style={{ background: liveCount > 0 ? "rgba(52,211,153,0.1)" : "rgba(251,113,133,0.1)", border: `1px solid ${liveCount > 0 ? "rgba(52,211,153,0.25)" : "rgba(251,113,133,0.25)"}` }}>
-            <motion.div className="w-2 h-2 rounded-full"
-              style={{ background: liveCount > 0 ? "#34d399" : "#fb7185" }}
-              animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.8, repeat: Infinity }} />
-            <span className="text-[11px] font-bold"
-              style={{ fontFamily: "var(--font-jetbrains)", color: liveCount > 0 ? "#34d399" : "#fb7185" }}>
-              {liveCount}/{PROVIDERS.length} activos
-            </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <motion.button
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onNavigate("audiovisuales")}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.28)", cursor: "pointer" }}>
+              <Video size={14} style={{ color: "#EF4444" }} />
+              <span className="text-[11px] font-bold"
+                style={{ fontFamily: "var(--font-syne)", color: "#fecdd3" }}>
+                Abrir Audiovisuales
+              </span>
+            </motion.button>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: liveCount > 0 ? "rgba(0,166,118,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${liveCount > 0 ? "rgba(0,166,118,0.25)" : "rgba(239,68,68,0.25)"}` }}>
+              <motion.div className="w-2 h-2 rounded-full"
+                style={{ background: liveCount > 0 ? "#00A676" : "#EF4444" }}
+                animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.8, repeat: Infinity }} />
+              <span className="text-[11px] font-bold"
+                style={{ fontFamily: "var(--font-jetbrains)", color: liveCount > 0 ? "#00A676" : "#EF4444" }}>
+                {liveCount}/{PROVIDERS.length} activos
+              </span>
+            </div>
           </div>
         </motion.div>
 
         {/* Grid de agentes 2×2 */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
           {PROVIDERS.map((p, i) => (
             <AgentCard
               key={p.id} prov={p} index={i}
@@ -225,19 +248,26 @@ export default function MissionControl({ onOpenAgent, onNavigate }: MissionContr
         </div>
 
         {/* Self Layer */}
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+        <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-4 rounded-full" style={{ background: "#a78bfa" }} />
+            <div className="w-1 h-4 rounded-full" style={{ background: "#F72585" }} />
             <span className="text-[10px] font-semibold tracking-[0.18em] uppercase"
-              style={{ fontFamily: "var(--font-syne)", color: "#a78bfa" }}>
+              style={{ fontFamily: "var(--font-syne)", color: "#F72585" }}>
               Tus herramientas personales
             </span>
-            <div className="flex-1 h-px" style={{ background: "rgba(167,139,250,0.1)" }} />
+            <div className="flex-1 h-px" style={{ background: "rgba(247,37,133,0.1)" }} />
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <SelfTile icon={Target}   label="Goals 🎯"   description="Metas del día · auto-sync Obsidian" color="#34d399" rgb="52,211,153"  delay={0.4}  onClick={() => onNavigate("goals")} />
-            <SelfTile icon={BookOpen} label="Journal 📓" description="Diario con voz · guarda en Obsidian" color="#a78bfa" rgb="167,139,250" delay={0.46} onClick={() => onNavigate("journal")} />
-            <SelfTile icon={Database} label="Memory 🧠"  description="Todos tus chats guardados"          color="#22d3ee" rgb="34,211,238"  delay={0.52} onClick={() => onNavigate("memory")} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            <SelfTile icon={BrainCircuit} label="Orquestador" description="Manda una misión al comité multiagente" color="#6D28D9" rgb="226,178,79" delay={0.3} onClick={() => onNavigate("orchestrator")} />
+            <SelfTile icon={SunMedium} label="Hoy ☀️" description="Pendientes, agenda, misiones y Daily Note" color="#6D28D9" rgb="226,178,79" delay={0.34} onClick={() => onNavigate("today")} />
+            <SelfTile icon={Inbox} label="Inbox universal" description="Captura y clasificación anti-caos" color="#6D28D9" rgb="226,178,79" delay={0.38} onClick={() => onNavigate("inbox")} />
+            <SelfTile icon={Megaphone} label="Marketing CC" description="Campañas, prompts y aprobaciones" color="#F72585" rgb="209,132,73" delay={0.42} onClick={() => onNavigate("marketing")} />
+            <SelfTile icon={Video} label="Audiovisuales" description="Imagen, video, prompts visuales e historial" color="#EF4444" rgb="196,98,58" delay={0.44} onClick={() => onNavigate("audiovisuales")} />
+            <SelfTile icon={Workflow} label="Workflows" description="SOPs para tareas repetibles" color="#00A676" rgb="138,154,85" delay={0.46} onClick={() => onNavigate("workflows")} />
+            <SelfTile icon={Network} label="Empresas/Personas" description="Contexto y esperando respuesta" color="#5F8C94" rgb="95,140,148" delay={0.5} onClick={() => onNavigate("empresas")} />
+            <SelfTile icon={Target}   label="Goals 🎯"   description="Metas del día · auto-sync Obsidian" color="#00A676" rgb="138,154,85"  delay={0.56}  onClick={() => onNavigate("goals")} />
+            <SelfTile icon={BookOpen} label="Journal 📓" description="Diario con voz · guarda en Obsidian" color="#F72585" rgb="209,132,73" delay={0.6} onClick={() => onNavigate("journal")} />
+            <SelfTile icon={Database} label="Memory 🧠"  description="Todos tus chats guardados"          color="#6D28D9" rgb="226,178,79"  delay={0.64} onClick={() => onNavigate("memory")} />
           </div>
         </motion.div>
 

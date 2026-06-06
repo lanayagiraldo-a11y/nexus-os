@@ -6,11 +6,11 @@ import type { NexusEvent } from "@/lib/nexusEvents";
 type EventType="success"|"warning"|"info"|"processing"|"system";
 interface FeedEvent{id:string;type:EventType;agent:string;message:string;ts:number;detail?:string;}
 const ECFG:Record<EventType,{icon:React.ElementType;color:string;bg:string}>={
-  success:{icon:CheckCircle,color:"#34d399",bg:"rgba(52,211,153,0.08)"},
-  warning:{icon:AlertTriangle,color:"#fbbf24",bg:"rgba(251,191,36,0.08)"},
-  info:{icon:Info,color:"#22d3ee",bg:"rgba(34,211,238,0.08)"},
-  processing:{icon:Zap,color:"#a78bfa",bg:"rgba(167,139,250,0.08)"},
-  system:{icon:Activity,color:"#94a3b8",bg:"rgba(148,163,184,0.06)"},
+  success:{icon:CheckCircle,color:"#00A676",bg:"rgba(0,166,118,0.08)"},
+  warning:{icon:AlertTriangle,color:"#6D28D9",bg:"rgba(109,40,217,0.08)"},
+  info:{icon:Info,color:"#6D28D9",bg:"rgba(109,40,217,0.08)"},
+  processing:{icon:Zap,color:"#F72585",bg:"rgba(247,37,133,0.08)"},
+  system:{icon:Activity,color:"#1F2937",bg:"rgba(31,41,55,0.06)"},
 };
 
 function relTime(ts:number):string{
@@ -59,33 +59,33 @@ export default function ActivityFeed({collapsed=false,onToggle}:ActivityFeedProp
   // ── Collapsed: thin rail with expand button ──
   if(collapsed){
     return(
-      <motion.div initial={{width:300}} animate={{width:52}} transition={{duration:0.35,ease:[0.22,1,0.36,1]}} className="flex flex-col items-center glass" style={{flexShrink:0,borderTop:"none",borderBottom:"none",borderRight:"none"}}>
-        <motion.button whileHover={{scale:1.1,background:"rgba(34,211,238,0.12)"}} whileTap={{scale:0.92}} onClick={onToggle} title="Expand Activity Feed" className="mt-4 w-9 h-9 rounded-lg flex items-center justify-center" style={{background:"rgba(34,211,238,0.06)",border:"1px solid rgba(34,211,238,0.15)",cursor:"pointer"}}>
-          <PanelRightOpen size={15} style={{color:"#22d3ee"}}/>
+      <motion.div initial={{width:300}} animate={{width:52}} transition={{duration:0.35,ease:[0.22,1,0.36,1]}} className="hidden xl:flex flex-col items-center glass" style={{flexShrink:0,borderTop:"none",borderBottom:"none",borderRight:"none"}}>
+        <motion.button whileHover={{scale:1.1,background:"rgba(109,40,217,0.12)"}} whileTap={{scale:0.92}} onClick={onToggle} title="Expand Activity Feed" className="mt-4 w-9 h-9 rounded-lg flex items-center justify-center" style={{background:"rgba(109,40,217,0.06)",border:"1px solid rgba(109,40,217,0.15)",cursor:"pointer"}}>
+          <PanelRightOpen size={15} style={{color:"#6D28D9"}}/>
         </motion.button>
         <div className="flex flex-col items-center gap-1 mt-5">
-          <Activity size={14} style={{color:"#22d3ee"}}/>
-          <span className="text-[9px] font-semibold tracking-[0.2em] uppercase" style={{fontFamily:"var(--font-syne)",color:"rgba(34,211,238,0.7)",writingMode:"vertical-rl"}}>Activity</span>
+          <Activity size={14} style={{color:"#6D28D9"}}/>
+          <span className="text-[9px] font-semibold tracking-[0.2em] uppercase" style={{fontFamily:"var(--font-syne)",color:"rgba(109,40,217,0.7)",writingMode:"vertical-rl"}}>Activity</span>
         </div>
         <div className="mt-4 relative">
-          <motion.div className="w-2 h-2 rounded-full" style={{background:"#34d399"}} animate={{opacity:[1,0.3,1]}} transition={{duration:1.5,repeat:Infinity}}/>
+          <motion.div className="w-2 h-2 rounded-full" style={{background:"#00A676"}} animate={{opacity:[1,0.3,1]}} transition={{duration:1.5,repeat:Infinity}}/>
         </div>
         <div className="mt-auto mb-4 flex flex-col items-center gap-1">
-          <span className="text-sm font-bold tabular-nums" style={{fontFamily:"var(--font-jetbrains)",color:"#22d3ee"}}>{events.length}</span>
-          <span className="text-[8px] tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(148,163,184,0.5)"}}>EV</span>
-          {alertCount>0&&<><span className="text-sm font-bold tabular-nums mt-2" style={{fontFamily:"var(--font-jetbrains)",color:"#fb7185"}}>{alertCount}</span><span className="text-[8px] tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(251,113,133,0.6)"}}>AL</span></>}
+          <span className="text-sm font-bold tabular-nums" style={{fontFamily:"var(--font-jetbrains)",color:"#6D28D9"}}>{events.length}</span>
+          <span className="text-[8px] tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.5)"}}>EV</span>
+          {alertCount>0&&<><span className="text-sm font-bold tabular-nums mt-2" style={{fontFamily:"var(--font-jetbrains)",color:"#EF4444"}}>{alertCount}</span><span className="text-[8px] tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(239,68,68,0.6)"}}>AL</span></>}
         </div>
       </motion.div>
     );
   }
 
   return(
-    <motion.div initial={{x:60,opacity:0}} animate={{x:0,opacity:1}} transition={{duration:0.5,delay:0.2,ease:[0.22,1,0.36,1]}} className="flex flex-col glass" style={{width:300,flexShrink:0,borderTop:"none",borderBottom:"none",borderRight:"none"}}>
-      <div className="flex items-center justify-between p-4 pb-3" style={{borderBottom:"1px solid rgba(34,211,238,0.08)"}}>
-        <div className="flex items-center gap-2"><Activity size={13} style={{color:"#22d3ee"}}/><span className="text-[11px] font-semibold tracking-[0.15em] uppercase" style={{fontFamily:"var(--font-syne)",color:"#22d3ee"}}>Activity Feed</span></div>
+    <motion.div initial={{x:60,opacity:0}} animate={{x:0,opacity:1}} transition={{duration:0.5,delay:0.2,ease:[0.22,1,0.36,1]}} className="hidden xl:flex flex-col glass" style={{width:300,flexShrink:0,borderTop:"none",borderBottom:"none",borderRight:"none"}}>
+      <div className="flex items-center justify-between p-4 pb-3" style={{borderBottom:"1px solid rgba(109,40,217,0.08)"}}>
+        <div className="flex items-center gap-2"><Activity size={13} style={{color:"#6D28D9"}}/><span className="text-[11px] font-semibold tracking-[0.15em] uppercase" style={{fontFamily:"var(--font-syne)",color:"#6D28D9"}}>Activity Feed</span></div>
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5"><motion.div className="w-1.5 h-1.5 rounded-full" style={{background:"#34d399"}} animate={{opacity:[1,0.3,1]}} transition={{duration:1.5,repeat:Infinity}}/><span className="text-[9px] tracking-widest" style={{fontFamily:"var(--font-jetbrains)",color:"#34d399"}}>LIVE</span></div>
-          <motion.button whileHover={{scale:1.12}} whileTap={{scale:0.9}} onClick={onToggle} title="Collapse Activity Feed" className="w-6 h-6 rounded-md flex items-center justify-center" style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",cursor:"pointer"}}><PanelRightClose size={12} style={{color:"rgba(148,163,184,0.6)"}}/></motion.button>
+          <div className="flex items-center gap-1.5"><motion.div className="w-1.5 h-1.5 rounded-full" style={{background:"#00A676"}} animate={{opacity:[1,0.3,1]}} transition={{duration:1.5,repeat:Infinity}}/><span className="text-[9px] tracking-widest" style={{fontFamily:"var(--font-jetbrains)",color:"#00A676"}}>LIVE</span></div>
+          <motion.button whileHover={{scale:1.12}} whileTap={{scale:0.9}} onClick={onToggle} title="Collapse Activity Feed" className="w-6 h-6 rounded-md flex items-center justify-center" style={{background:"rgba(7,24,46,0.04)",border:"1px solid rgba(7,24,46,0.08)",cursor:"pointer"}}><PanelRightClose size={12} style={{color:"rgba(31,41,55,0.6)"}}/></motion.button>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1.5">
@@ -98,10 +98,10 @@ export default function ActivityFeed({collapsed=false,onToggle}:ActivityFeedProp
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[10px] font-semibold tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:cfg.color}}>{ev.agent}</span>
-                      <span className="text-[9px]" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(148,163,184,0.4)"}}>{relTime(ev.ts)}</span>
+                      <span className="text-[9px]" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.4)"}}>{relTime(ev.ts)}</span>
                     </div>
                     <div className="text-[11px] mt-0.5 leading-snug" style={{fontFamily:"var(--font-outfit)",color:"rgba(226,232,240,0.92)"}}>{ev.message}</div>
-                    {ev.detail&&<div className="text-[10px] mt-1 flex items-center gap-1" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(148,163,184,0.6)"}}><ArrowRight size={8}/>{ev.detail}</div>}
+                    {ev.detail&&<div className="text-[10px] mt-1 flex items-center gap-1" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.6)"}}><ArrowRight size={8}/>{ev.detail}</div>}
                   </div>
                 </div>
               </div>
@@ -109,12 +109,12 @@ export default function ActivityFeed({collapsed=false,onToggle}:ActivityFeedProp
           );})}
         </AnimatePresence>
       </div>
-      <div className="p-3" style={{borderTop:"1px solid rgba(34,211,238,0.08)"}}>
+      <div className="p-3" style={{borderTop:"1px solid rgba(109,40,217,0.08)"}}>
         <div className="grid grid-cols-3 gap-2">
-          {[{label:"Events",value:String(events.length),color:"#22d3ee"},{label:"Agents",value:"4",color:"#34d399"},{label:"Alerts",value:String(alertCount),color:"#fb7185"}].map(s=>(
-            <div key={s.label} className="text-center p-1.5 rounded-sm" style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)"}}>
+          {[{label:"Events",value:String(events.length),color:"#6D28D9"},{label:"Agents",value:"4",color:"#00A676"},{label:"Alerts",value:String(alertCount),color:"#EF4444"}].map(s=>(
+            <div key={s.label} className="text-center p-1.5 rounded-sm" style={{background:"rgba(7,24,46,0.02)",border:"1px solid rgba(7,24,46,0.04)"}}>
               <div className="text-sm font-bold tabular-nums" style={{fontFamily:"var(--font-jetbrains)",color:s.color}}>{s.value}</div>
-              <div className="text-[9px] mt-0.5" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(148,163,184,0.4)"}}>{s.label}</div>
+              <div className="text-[9px] mt-0.5" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.4)"}}>{s.label}</div>
             </div>
           ))}
         </div>

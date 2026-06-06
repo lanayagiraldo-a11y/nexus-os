@@ -23,12 +23,12 @@ function CodeBlock({ children }: { children: string }) {
   return (
     <div className="relative group my-3">
       <pre className="rounded-xl p-4 text-[12px] leading-relaxed overflow-x-auto"
-        style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(34,211,238,0.15)", fontFamily: "var(--font-jetbrains)", color: "#67e8f9" }}>
+        style={{ background: "rgba(7,24,46,0.5)", border: "1px solid rgba(109,40,217,0.15)", fontFamily: "var(--font-jetbrains)", color: "#67e8f9" }}>
         {children}
       </pre>
       <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
         className="absolute top-2 right-2 px-2 py-1 rounded-md text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ background: "rgba(34,211,238,0.15)", border: "1px solid rgba(34,211,238,0.3)", color: "#22d3ee", cursor: "pointer" }}>
+        style={{ background: "rgba(109,40,217,0.15)", border: "1px solid rgba(109,40,217,0.3)", color: "#6D28D9", cursor: "pointer" }}>
         {copied ? "✓ Copiado" : "Copiar"}
       </button>
     </div>
@@ -38,7 +38,7 @@ function CodeBlock({ children }: { children: string }) {
 function Tip({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex gap-3 p-3 rounded-xl my-3"
-      style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.18)" }}>
+      style={{ background: "rgba(109,40,217,0.06)", border: "1px solid rgba(109,40,217,0.18)" }}>
       <span className="text-[15px] flex-shrink-0">💡</span>
       <p className="text-[13px] leading-relaxed" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.7)" }}>{children}</p>
     </div>
@@ -64,7 +64,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
 
   const sections: Section[] = [
     {
-      id: "start", emoji: "🚀", title: "Qué es NEXUS OS", color: "#22d3ee", colorRgb: "34,211,238",
+      id: "start", emoji: "🚀", title: "Qué es NEXUS OS", color: "#6D28D9", colorRgb: "226,178,79",
       steps: [
         { id: "s1", emoji: "✅", title: "Entiendo qué es NEXUS OS", done: checks["s1"] },
         { id: "s2", emoji: "✅", title: "Tengo el dashboard abierto", done: checks["s2"] },
@@ -72,17 +72,17 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       content: (
         <div className="space-y-4">
           <p className="text-[14px] leading-relaxed" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.8)" }}>
-            NEXUS OS es tu <strong style={{ color: "#22d3ee" }}>centro de comando de IA personal</strong> — un dashboard que vive en tu computador y te permite hablar con Claude, ChatGPT y Gemini desde un solo lugar.
+            NEXUS OS es tu <strong style={{ color: "#6D28D9" }}>centro de comando de IA personal</strong> — un dashboard que vive en tu computador y te permite hablar con Claude, ChatGPT y Gemini desde un solo lugar.
           </p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: "💬", label: "Chat con 4 agentes de IA", color: "#a78bfa" },
-              { icon: "🎤", label: "Habla con voz en lugar de escribir", color: "#34d399" },
-              { icon: "🧠", label: "Todo se guarda en Obsidian", color: "#60a5fa" },
-              { icon: "🎯", label: "Trackea metas y escribe tu diario", color: "#fbbf24" },
+              { icon: "💬", label: "Chat con 4 agentes de IA", color: "#F72585" },
+              { icon: "🎤", label: "Habla con voz en lugar de escribir", color: "#00A676" },
+              { icon: "🧠", label: "Todo se guarda en Obsidian", color: "#5F8C94" },
+              { icon: "🎯", label: "Trackea metas y escribe tu diario", color: "#6D28D9" },
             ].map(item => (
               <div key={item.label} className="flex items-start gap-2.5 p-3 rounded-xl"
-                style={{ background: `rgba(${item.color === "#a78bfa" ? "167,139,250" : item.color === "#34d399" ? "52,211,153" : item.color === "#60a5fa" ? "96,165,250" : "251,191,36"},0.06)`, border: `1px solid rgba(${item.color === "#a78bfa" ? "167,139,250" : item.color === "#34d399" ? "52,211,153" : item.color === "#60a5fa" ? "96,165,250" : "251,191,36"},0.15)` }}>
+                style={{ background: `rgba(${item.color === "#F72585" ? "209,132,73" : item.color === "#00A676" ? "138,154,85" : item.color === "#5F8C94" ? "95,140,148" : "226,178,79"},0.06)`, border: `1px solid rgba(${item.color === "#F72585" ? "209,132,73" : item.color === "#00A676" ? "138,154,85" : item.color === "#5F8C94" ? "95,140,148" : "226,178,79"},0.15)` }}>
                 <span className="text-[18px]">{item.icon}</span>
                 <p className="text-[12px] leading-snug" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.7)" }}>{item.label}</p>
               </div>
@@ -93,7 +93,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       ),
     },
     {
-      id: "chat", emoji: "💬", title: "Chatear con los agentes", color: "#a78bfa", colorRgb: "167,139,250",
+      id: "chat", emoji: "💬", title: "Chatear con los agentes", color: "#F72585", colorRgb: "209,132,73",
       steps: [
         { id: "c1", emoji: "✅", title: "Abrí el chat de Claude", done: checks["c1"] },
         { id: "c2", emoji: "✅", title: "Envié mi primer mensaje", done: checks["c2"] },
@@ -106,17 +106,17 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
           </p>
           <div className="space-y-2">
             {[
-              { color: "#a78bfa", name: "Claude", desc: "Razonamiento profundo, código, análisis estratégico" },
-              { color: "#34d399", name: "ChatGPT", desc: "Versátil para todo — emails, ideas, resúmenes" },
-              { color: "#60a5fa", name: "Gemini", desc: "Multimodal, búsqueda en tiempo real, velocidad" },
-              { color: "#fbbf24", name: "Hermes", desc: "Agente en VPS — tareas privadas y locales" },
+              { color: "#F72585", name: "Claude", desc: "Razonamiento profundo, código, análisis estratégico" },
+              { color: "#00A676", name: "ChatGPT", desc: "Versátil para todo — emails, ideas, resúmenes" },
+              { color: "#5F8C94", name: "Gemini", desc: "Multimodal, búsqueda en tiempo real, velocidad" },
+              { color: "#6D28D9", name: "Hermes", desc: "Agente en VPS — tareas privadas y locales" },
             ].map(a => (
               <div key={a.name} className="flex items-center gap-3 p-3 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                style={{ background: "rgba(7,24,46,0.02)", border: "1px solid rgba(7,24,46,0.06)" }}>
                 <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: a.color }} />
                 <div>
                   <span className="text-[13px] font-semibold" style={{ fontFamily: "var(--font-syne)", color: a.color }}>{a.name}</span>
-                  <span className="text-[12px] ml-2" style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.6)" }}>{a.desc}</span>
+                  <span className="text-[12px] ml-2" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.6)" }}>{a.desc}</span>
                 </div>
               </div>
             ))}
@@ -126,7 +126,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       ),
     },
     {
-      id: "voice", emoji: "🎤", title: "Hablar con voz", color: "#34d399", colorRgb: "52,211,153",
+      id: "voice", emoji: "🎤", title: "Hablar con voz", color: "#00A676", colorRgb: "138,154,85",
       steps: [
         { id: "v1", emoji: "✅", title: "Hice clic en el ícono de micrófono", done: checks["v1"] },
         { id: "v2", emoji: "✅", title: "Vi mis palabras aparecer en tiempo real", done: checks["v2"] },
@@ -134,10 +134,10 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       content: (
         <div className="space-y-4">
           <p className="text-[14px] leading-relaxed" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.8)" }}>
-            Todos los chats, Goals y Journal tienen un botón de micrófono. <strong style={{ color: "#34d399" }}>Sin API keys</strong> — usa el reconocimiento de voz del browser.
+            Todos los chats, Goals y Journal tienen un botón de micrófono. <strong style={{ color: "#00A676" }}>Sin API keys</strong> — usa el reconocimiento de voz del browser.
           </p>
-          <div className="rounded-xl p-4 space-y-3" style={{ background: "rgba(52,211,153,0.05)", border: "1px solid rgba(52,211,153,0.15)" }}>
-            <p className="text-[12px] font-semibold tracking-widest uppercase" style={{ fontFamily: "var(--font-jetbrains)", color: "#34d399" }}>Cómo usarlo</p>
+          <div className="rounded-xl p-4 space-y-3" style={{ background: "rgba(0,166,118,0.05)", border: "1px solid rgba(0,166,118,0.15)" }}>
+            <p className="text-[12px] font-semibold tracking-widest uppercase" style={{ fontFamily: "var(--font-jetbrains)", color: "#00A676" }}>Cómo usarlo</p>
             {["1. Abre cualquier chat (Claude, ChatGPT, Gemini)", "2. Haz clic en el ícono del micrófono 🎤", "3. Habla — verás el texto aparecer en tiempo real", "4. Cuando termines, el texto queda listo para enviar", "5. Presiona Enter o haz clic en Enviar"].map(s => (
               <p key={s} className="text-[13px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.7)" }}>{s}</p>
             ))}
@@ -147,7 +147,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       ),
     },
     {
-      id: "obsidian", emoji: "🧠", title: "Obsidian — tu memoria", color: "#60a5fa", colorRgb: "96,165,250",
+      id: "obsidian", emoji: "🧠", title: "Obsidian — tu memoria", color: "#5F8C94", colorRgb: "95,140,148",
       steps: [
         { id: "o1", emoji: "✅", title: "Encontré la carpeta Agentic OS en mi vault", done: checks["o1"] },
         { id: "o2", emoji: "✅", title: "Vi un chat guardado en Chats/", done: checks["o2"] },
@@ -156,19 +156,19 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       content: (
         <div className="space-y-4">
           <p className="text-[14px] leading-relaxed" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.8)" }}>
-            NEXUS OS guarda todo en tu vault de Obsidian automáticamente. Abre Obsidian y busca la carpeta <code style={{ color: "#60a5fa", background: "rgba(96,165,250,0.1)", padding: "1px 6px", borderRadius: 4 }}>Agentic OS</code>.
+            NEXUS OS guarda todo en tu vault de Obsidian automáticamente. Abre Obsidian y busca la carpeta <code style={{ color: "#5F8C94", background: "rgba(247,37,133,0.1)", padding: "1px 6px", borderRadius: 4 }}>Agentic OS</code>.
           </p>
-          <div className="rounded-xl p-4" style={{ background: "rgba(96,165,250,0.05)", border: "1px solid rgba(96,165,250,0.15)" }}>
-            <p className="text-[11px] font-semibold tracking-widest uppercase mb-3" style={{ fontFamily: "var(--font-jetbrains)", color: "#60a5fa" }}>Estructura de archivos</p>
+          <div className="rounded-xl p-4" style={{ background: "rgba(247,37,133,0.05)", border: "1px solid rgba(247,37,133,0.15)" }}>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-3" style={{ fontFamily: "var(--font-jetbrains)", color: "#5F8C94" }}>Estructura de archivos</p>
             <div className="space-y-1.5" style={{ fontFamily: "var(--font-jetbrains)", fontSize: 12 }}>
               {[
-                { indent: 0, text: "📁 Agentic OS/", color: "#60a5fa" },
-                { indent: 1, text: "📁 Chats/", color: "rgba(148,163,184,0.7)" },
-                { indent: 2, text: "📄 2026-05-30.md  ← chats del día", color: "rgba(148,163,184,0.5)" },
-                { indent: 1, text: "📁 Goals/", color: "rgba(148,163,184,0.7)" },
-                { indent: 2, text: "📄 goals.md  ← todas tus metas", color: "rgba(148,163,184,0.5)" },
-                { indent: 1, text: "📁 Journal/", color: "rgba(148,163,184,0.7)" },
-                { indent: 2, text: "📄 2026-05-30.md  ← diario del día", color: "rgba(148,163,184,0.5)" },
+                { indent: 0, text: "📁 Agentic OS/", color: "#5F8C94" },
+                { indent: 1, text: "📁 Chats/", color: "rgba(31,41,55,0.7)" },
+                { indent: 2, text: "📄 2026-05-30.md  ← chats del día", color: "rgba(31,41,55,0.5)" },
+                { indent: 1, text: "📁 Goals/", color: "rgba(31,41,55,0.7)" },
+                { indent: 2, text: "📄 goals.md  ← todas tus metas", color: "rgba(31,41,55,0.5)" },
+                { indent: 1, text: "📁 Journal/", color: "rgba(31,41,55,0.7)" },
+                { indent: 2, text: "📄 2026-05-30.md  ← diario del día", color: "rgba(31,41,55,0.5)" },
               ].map((line, i) => (
                 <div key={i} className="flex" style={{ paddingLeft: line.indent * 18 }}>
                   <span style={{ color: line.color }}>{line.text}</span>
@@ -181,7 +181,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       ),
     },
     {
-      id: "goals", emoji: "🎯", title: "Goals y Journal", color: "#fbbf24", colorRgb: "251,191,36",
+      id: "goals", emoji: "🎯", title: "Goals y Journal", color: "#6D28D9", colorRgb: "226,178,79",
       steps: [
         { id: "g1", emoji: "✅", title: "Agregué mi primera meta", done: checks["g1"] },
         { id: "g2", emoji: "✅", title: "Marqué una meta como completada", done: checks["g2"] },
@@ -190,19 +190,19 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       content: (
         <div className="space-y-4">
           <p className="text-[14px] leading-relaxed" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.8)" }}>
-            En el sidebar encuentra <strong style={{ color: "#fbbf24" }}>Goals 🎯</strong> y <strong style={{ color: "#a78bfa" }}>Journal 📓</strong>. Ambos soportan voz y se sincronizan con Obsidian.
+            En el sidebar encuentra <strong style={{ color: "#6D28D9" }}>Goals 🎯</strong> y <strong style={{ color: "#F72585" }}>Journal 📓</strong>. Ambos soportan voz y se sincronizan con Obsidian.
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-xl" style={{ background: "rgba(251,191,36,0.05)", border: "1px solid rgba(251,191,36,0.15)" }}>
-              <p className="text-[12px] font-bold mb-2" style={{ fontFamily: "var(--font-syne)", color: "#fbbf24" }}>🎯 Goals</p>
+            <div className="p-4 rounded-xl" style={{ background: "rgba(109,40,217,0.05)", border: "1px solid rgba(109,40,217,0.15)" }}>
+              <p className="text-[12px] font-bold mb-2" style={{ fontFamily: "var(--font-syne)", color: "#6D28D9" }}>🎯 Goals</p>
               <ul className="space-y-1">
                 {["Escribe tu meta", "Presiona Enter", "Haz clic en el círculo para completar", "Se guarda solo en Obsidian"].map(s => (
                   <li key={s} className="text-[12px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.6)" }}>· {s}</li>
                 ))}
               </ul>
             </div>
-            <div className="p-4 rounded-xl" style={{ background: "rgba(167,139,250,0.05)", border: "1px solid rgba(167,139,250,0.15)" }}>
-              <p className="text-[12px] font-bold mb-2" style={{ fontFamily: "var(--font-syne)", color: "#a78bfa" }}>📓 Journal</p>
+            <div className="p-4 rounded-xl" style={{ background: "rgba(247,37,133,0.05)", border: "1px solid rgba(247,37,133,0.15)" }}>
+              <p className="text-[12px] font-bold mb-2" style={{ fontFamily: "var(--font-syne)", color: "#F72585" }}>📓 Journal</p>
               <ul className="space-y-1">
                 {["Escribe o habla tu entrada", "Haz clic en Guardar entrada", "Se crea un archivo por día", "Puedes ver entradas anteriores"].map(s => (
                   <li key={s} className="text-[12px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.6)" }}>· {s}</li>
@@ -214,7 +214,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       ),
     },
     {
-      id: "tips", emoji: "✨", title: "Tips y atajos", color: "#fb7185", colorRgb: "251,113,133",
+      id: "tips", emoji: "✨", title: "Tips y atajos", color: "#EF4444", colorRgb: "196,98,58",
       steps: [
         { id: "t1", emoji: "✅", title: "Usé ⌘K para navegar rápido", done: checks["t1"] },
         { id: "t2", emoji: "✅", title: "Copié una respuesta del agente", done: checks["t2"] },
@@ -231,9 +231,9 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
               { key: "↩ clic", desc: "Limpiar el chat y empezar de cero" },
             ].map(item => (
               <div key={item.key} className="flex items-center gap-3 p-2.5 rounded-lg"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                style={{ background: "rgba(7,24,46,0.02)", border: "1px solid rgba(7,24,46,0.05)" }}>
                 <kbd className="px-2 py-1 rounded-md text-[11px] font-semibold flex-shrink-0"
-                  style={{ background: "rgba(251,113,133,0.12)", border: "1px solid rgba(251,113,133,0.25)", fontFamily: "var(--font-jetbrains)", color: "#fb7185" }}>
+                  style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", fontFamily: "var(--font-jetbrains)", color: "#EF4444" }}>
                   {item.key}
                 </kbd>
                 <span className="text-[13px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.65)" }}>{item.desc}</span>
@@ -289,27 +289,27 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
         {celebrating && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5"
-            style={{ background: "rgba(2,4,9,0.92)", backdropFilter: "blur(12px)" }}>
+            style={{ background: "rgba(247,239,226,0.92)", backdropFilter: "blur(12px)" }}>
             <motion.div initial={{ scale: 0.5, rotate: -12 }} animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 260, damping: 16 }}
               className="w-24 h-24 rounded-3xl flex items-center justify-center"
-              style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.35)", boxShadow: "0 0 60px rgba(52,211,153,0.3)" }}>
-              <PartyPopper size={44} style={{ color: "#34d399" }} />
+              style={{ background: "rgba(0,166,118,0.12)", border: "1px solid rgba(0,166,118,0.35)", boxShadow: "0 0 60px rgba(0,166,118,0.3)" }}>
+              <PartyPopper size={44} style={{ color: "#00A676" }} />
             </motion.div>
             <div className="text-center">
               <motion.h2 initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}
-                className="text-3xl font-black mb-2" style={{ fontFamily: "var(--font-syne)", color: "#e2e8f0" }}>
+                className="text-3xl font-black mb-2" style={{ fontFamily: "var(--font-syne)", color: "#07182E" }}>
                 ¡Guía completada! 🎉
               </motion.h2>
               <motion.p initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
-                className="text-[14px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(148,163,184,0.7)" }}>
+                className="text-[14px]" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.7)" }}>
                 Ya dominas NEXUS OS, Liliana. Volviendo al Command Center…
               </motion.p>
             </div>
             <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
               onClick={() => { setCelebrating(false); onFinish?.(); }}
               className="px-5 py-2 rounded-xl text-[13px] font-semibold"
-              style={{ background: "rgba(34,211,238,0.1)", border: "1px solid rgba(34,211,238,0.3)", color: "#22d3ee", fontFamily: "var(--font-syne)", cursor: "pointer" }}>
+              style={{ background: "rgba(109,40,217,0.1)", border: "1px solid rgba(109,40,217,0.3)", color: "#6D28D9", fontFamily: "var(--font-syne)", cursor: "pointer" }}>
               Ir ahora →
             </motion.button>
           </motion.div>
@@ -317,20 +317,20 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
       </AnimatePresence>
       {/* Sidebar de secciones */}
       <div className="flex flex-col flex-shrink-0 overflow-y-auto p-4 gap-1"
-        style={{ width: 220, borderRight: "1px solid rgba(255,255,255,0.06)", background: "rgba(5,10,24,0.6)" }}>
+        style={{ width: 220, borderRight: "1px solid rgba(7,24,46,0.06)", background: "rgba(52,35,22,0.6)" }}>
         <div className="mb-3 px-2">
-          <p className="text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.4)" }}>Guía NEXUS OS</p>
+          <p className="text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.4)" }}>Guía NEXUS OS</p>
           {/* Progress */}
-          <div className="p-2.5 rounded-xl mb-2" style={{ background: "rgba(34,211,238,0.05)", border: "1px solid rgba(34,211,238,0.12)" }}>
+          <div className="p-2.5 rounded-xl mb-2" style={{ background: "rgba(109,40,217,0.05)", border: "1px solid rgba(109,40,217,0.12)" }}>
             <div className="flex justify-between mb-1.5">
-              <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.5)" }}>Progreso</span>
-              <span className="text-[11px] font-bold" style={{ fontFamily: "var(--font-jetbrains)", color: "#22d3ee" }}>{pct}%</span>
+              <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.5)" }}>Progreso</span>
+              <span className="text-[11px] font-bold" style={{ fontFamily: "var(--font-jetbrains)", color: "#6D28D9" }}>{pct}%</span>
             </div>
-            <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(34,211,238,0.1)" }}>
-              <motion.div className="h-full rounded-full" style={{ background: "linear-gradient(90deg,#22d3ee,#a78bfa)" }}
+            <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(109,40,217,0.1)" }}>
+              <motion.div className="h-full rounded-full" style={{ background: "linear-gradient(90deg,#6D28D9,#F72585)" }}
                 animate={{ width: `${pct}%` }} transition={{ duration: 0.6, ease: "easeOut" }} />
             </div>
-            <p className="text-[9px] mt-1" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.35)" }}>{doneSteps}/{totalSteps} pasos</p>
+            <p className="text-[9px] mt-1" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.35)" }}>{doneSteps}/{totalSteps} pasos</p>
           </div>
         </div>
 
@@ -340,11 +340,11 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
           return (
             <motion.button key={s.id} onClick={() => setActiveSection(s.id)} whileHover={{ x: 2 }} whileTap={{ scale: 0.97 }}
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left w-full"
-              style={{ background: isActive ? `rgba(34,211,238,0.08)` : "transparent", border: isActive ? "1px solid rgba(34,211,238,0.2)" : "1px solid transparent", cursor: "pointer" }}>
+              style={{ background: isActive ? `rgba(109,40,217,0.08)` : "transparent", border: isActive ? "1px solid rgba(109,40,217,0.2)" : "1px solid transparent", cursor: "pointer" }}>
               <span className="text-[15px]">{s.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[12px] font-semibold truncate" style={{ fontFamily: "var(--font-outfit)", color: isActive ? "#e2e8f0" : "rgba(148,163,184,0.6)" }}>{s.title}</p>
-                <p className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.3)" }}>{sectionDone}/{s.steps.length} ✓</p>
+                <p className="text-[12px] font-semibold truncate" style={{ fontFamily: "var(--font-outfit)", color: isActive ? "#07182E" : "rgba(31,41,55,0.6)" }}>{s.title}</p>
+                <p className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.3)" }}>{sectionDone}/{s.steps.length} ✓</p>
               </div>
             </motion.button>
           );
@@ -353,9 +353,9 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
         <div className="mt-auto pt-3">
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={saveGuideToObsidian}
             className="flex items-center gap-2 w-full px-3 py-2 rounded-xl"
-            style={{ background: savedToObsidian ? "rgba(52,211,153,0.12)" : "rgba(34,211,238,0.06)", border: savedToObsidian ? "1px solid rgba(52,211,153,0.3)" : "1px solid rgba(34,211,238,0.15)", cursor: "pointer" }}>
-            <Save size={12} style={{ color: savedToObsidian ? "#34d399" : "#22d3ee" }} />
-            <span className="text-[11px] font-semibold" style={{ fontFamily: "var(--font-syne)", color: savedToObsidian ? "#34d399" : "#22d3ee" }}>
+            style={{ background: savedToObsidian ? "rgba(0,166,118,0.12)" : "rgba(109,40,217,0.06)", border: savedToObsidian ? "1px solid rgba(0,166,118,0.3)" : "1px solid rgba(109,40,217,0.15)", cursor: "pointer" }}>
+            <Save size={12} style={{ color: savedToObsidian ? "#00A676" : "#6D28D9" }} />
+            <span className="text-[11px] font-semibold" style={{ fontFamily: "var(--font-syne)", color: savedToObsidian ? "#00A676" : "#6D28D9" }}>
               {savedToObsidian ? "¡Guardado!" : "Guardar en Obsidian"}
             </span>
           </motion.button>
@@ -370,7 +370,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
             <div className="flex items-center gap-3 mb-6">
               <div className="w-1 h-8 rounded-full" style={{ background: active.color }} />
               <div>
-                <h1 className="text-2xl font-black" style={{ fontFamily: "var(--font-syne)", color: "#e2e8f0" }}>
+                <h1 className="text-2xl font-black" style={{ fontFamily: "var(--font-syne)", color: "#07182E" }}>
                   {active.emoji} {active.title}
                 </h1>
               </div>
@@ -380,18 +380,18 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
             <div className="mb-6">{active.content}</div>
 
             {/* Checklist de pasos */}
-            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)" }}>
-              <p className="text-[10px] tracking-widest uppercase mb-3" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(148,163,184,0.4)" }}>Checklist</p>
+            <div className="rounded-xl p-4" style={{ background: "rgba(7,24,46,0.02)", border: "1px solid rgba(7,24,46,0.07)" }}>
+              <p className="text-[10px] tracking-widest uppercase mb-3" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.4)" }}>Checklist</p>
               <div className="space-y-2">
                 {active.steps.map(step => (
                   <motion.button key={step.id} onClick={() => toggle(step.id)} whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }}
                     className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg"
-                    style={{ background: checks[step.id] ? "rgba(52,211,153,0.06)" : "transparent", cursor: "pointer", border: "none" }}>
+                    style={{ background: checks[step.id] ? "rgba(0,166,118,0.06)" : "transparent", cursor: "pointer", border: "none" }}>
                     {checks[step.id]
-                      ? <CheckCircle size={16} style={{ color: "#34d399", flexShrink: 0 }} />
-                      : <Circle size={16} style={{ color: "rgba(148,163,184,0.3)", flexShrink: 0 }} />}
+                      ? <CheckCircle size={16} style={{ color: "#00A676", flexShrink: 0 }} />
+                      : <Circle size={16} style={{ color: "rgba(31,41,55,0.3)", flexShrink: 0 }} />}
                     <span className="text-[13px]"
-                      style={{ fontFamily: "var(--font-outfit)", color: checks[step.id] ? "rgba(148,163,184,0.5)" : "rgba(226,232,240,0.8)", textDecoration: checks[step.id] ? "line-through" : "none" }}>
+                      style={{ fontFamily: "var(--font-outfit)", color: checks[step.id] ? "rgba(31,41,55,0.5)" : "rgba(226,232,240,0.8)", textDecoration: checks[step.id] ? "line-through" : "none" }}>
                       {step.title}
                     </span>
                   </motion.button>
@@ -405,7 +405,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
                 <motion.button whileHover={{ x: -2 }} whileTap={{ scale: 0.96 }}
                   onClick={() => setActiveSection(sections[sections.findIndex(s => s.id === activeSection) - 1].id)}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer", color: "rgba(148,163,184,0.6)", fontFamily: "var(--font-outfit)", fontSize: 13 }}>
+                  style={{ background: "rgba(7,24,46,0.04)", border: "1px solid rgba(7,24,46,0.08)", cursor: "pointer", color: "rgba(31,41,55,0.6)", fontFamily: "var(--font-outfit)", fontSize: 13 }}>
                   ← Anterior
                 </motion.button>
               )}
@@ -414,7 +414,7 @@ export default function GuideView({ onFinish }: GuideViewProps = {}) {
                 <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.96 }}
                   onClick={() => setActiveSection(sections[sections.findIndex(s => s.id === activeSection) + 1].id)}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl"
-                  style={{ background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.2)", cursor: "pointer", color: "#22d3ee", fontFamily: "var(--font-outfit)", fontSize: 13 }}>
+                  style={{ background: "rgba(109,40,217,0.08)", border: "1px solid rgba(109,40,217,0.2)", cursor: "pointer", color: "#6D28D9", fontFamily: "var(--font-outfit)", fontSize: 13 }}>
                   Siguiente <ChevronRight size={14} />
                 </motion.button>
               )}

@@ -4,37 +4,37 @@
   --font-display: 'Syne', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-body: 'Outfit', sans-serif;
-  --color-void: #020409;
-  --color-deep: #050a18;
-  --color-surface: #080e1f;
-  --color-elevated: #0d1428;
-  --color-cyan: #22d3ee;
-  --color-violet: #a78bfa;
-  --color-emerald: #34d399;
-  --color-amber: #fbbf24;
-  --color-rose: #fb7185;
-  --color-text: #e2e8f0;
-  --color-muted: #94a3b8;
-  --color-ghost: #334155;
+  --color-void: #F7EFE2;
+  --color-deep: #F7EFE2;
+  --color-surface: #F7EFE2;
+  --color-elevated: #FFFFFF;
+  --color-cyan: #6D28D9;
+  --color-violet: #8B1CF6;
+  --color-emerald: #00A676;
+  --color-amber: #F59E0B;
+  --color-rose: #EF4444;
+  --color-text: #07182E;
+  --color-muted: #1F2937;
+  --color-ghost: #245BFF;
 }
 * { box-sizing: border-box; }
 html { height: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; }
-body { height: 100%; overflow: hidden; background: #020409; color: #e2e8f0; font-family: 'Outfit', sans-serif; }
+body { height: 100%; overflow: hidden; background: radial-gradient(circle at 12% 0%, rgba(109,40,217,0.26), transparent 30%), radial-gradient(circle at 78% 8%, rgba(139,28,246,0.22), transparent 30%), radial-gradient(circle at 92% 48%, rgba(247,37,133,0.16), transparent 25%), radial-gradient(circle at 48% 100%, rgba(245,158,11,0.16), transparent 34%), linear-gradient(135deg, #F7EFE2 0%, #F2E7FF 42%, #EEF4FF 72%, #FDF7E7 100%); color: #07182E; font-family: 'Outfit', sans-serif; }
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.2); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.4); }
-.glass { background: rgba(8,14,31,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(34,211,238,0.1); }
-.grid-bg { background-image: linear-gradient(rgba(34,211,238,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.025) 1px, transparent 1px); background-size: 44px 44px; }
-.dot-active { background:#34d399; box-shadow:0 0 0 0 rgba(52,211,153,0.4); animation: pulse-emerald 2s infinite; }
-.dot-processing { background:#22d3ee; animation: pulse-cyan 1.4s infinite; }
-.dot-idle { background:#fbbf24; }
-.dot-error { background:#fb7185; animation: pulse-rose 1s infinite; }
-.dot-offline { background:#334155; }
+::-webkit-scrollbar-thumb { background: rgba(109,40,217,0.42); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139,28,246,0.62); }
+.glass { background: rgba(255,255,255,0.76); backdrop-filter: blur(24px) saturate(1.28); -webkit-backdrop-filter: blur(24px) saturate(1.28); border: 1px solid rgba(109,40,217,0.14); box-shadow: 0 24px 74px rgba(109,40,217,0.18), 0 12px 34px rgba(7,24,46,0.10); }
+.grid-bg { background-image: linear-gradient(rgba(109,40,217,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(139,28,246,0.05) 1px, transparent 1px); background-size: 44px 44px; }
+.dot-active { background:#00A676; box-shadow:0 0 0 0 rgba(0,166,118,0.4); animation: pulse-emerald 2s infinite; }
+.dot-processing { background:#6D28D9; animation: pulse-cyan 1.4s infinite; }
+.dot-idle { background:#245BFF; }
+.dot-error { background:#EF4444; animation: pulse-rose 1s infinite; }
+.dot-offline { background:#7C3AED; }
 .animate-float { animation: float 4s ease-in-out infinite; }
 .animate-spin-slow { animation: spin-slow 8s linear infinite; }
-@keyframes pulse-cyan { 0%,100%{box-shadow:0 0 0 0 rgba(34,211,238,0.5)}50%{box-shadow:0 0 0 7px rgba(34,211,238,0)} }
-@keyframes pulse-emerald { 0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0.5)}50%{box-shadow:0 0 0 7px rgba(52,211,153,0)} }
-@keyframes pulse-rose { 0%,100%{box-shadow:0 0 0 0 rgba(251,113,133,0.5)}50%{box-shadow:0 0 0 7px rgba(251,113,133,0)} }
+@keyframes pulse-cyan { 0%,100%{box-shadow:0 0 0 0 rgba(109,40,217,0.5)}50%{box-shadow:0 0 0 7px rgba(109,40,217,0)} }
+@keyframes pulse-emerald { 0%,100%{box-shadow:0 0 0 0 rgba(0,166,118,0.5)}50%{box-shadow:0 0 0 7px rgba(0,166,118,0)} }
+@keyframes pulse-rose { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)} }
 @keyframes float { 0%,100%{transform:translateY(0px)}50%{transform:translateY(-4px)} }
 @keyframes spin-slow { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
