@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutDashboard, BarChart3, Settings, Target, BookOpen, Database, BookMarked, SunMedium, Inbox, Megaphone, Video, Workflow, Network, BrainCircuit, Menu, X } from "lucide-react";
+import { LayoutDashboard, BarChart3, Settings, Target, BookOpen, Database, BookMarked, SunMedium, Inbox, Megaphone, Video, Workflow, Network, BrainCircuit, Menu, X, ChevronDown } from "lucide-react";
 import AgentAvatar from "./AgentAvatar";
 import { PROVIDERS } from "@/lib/providers";
 import type { ProviderId } from "@/lib/providers";
@@ -38,49 +38,65 @@ const overviewItems = [
 ];
 
 function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavigate:(v:string)=>void;health:Record<string,ProviderHealth>}) {
+  const [agentsOpen, setAgentsOpen] = useState(activeView.startsWith("agent-"));
+
+  useEffect(() => {
+    if (activeView.startsWith("agent-")) setAgentsOpen(true);
+  }, [activeView]);
+
   return (
     <>
       <div className="p-3 pb-2">
         <p className="text-[10px] tracking-[0.22em] uppercase px-3 mb-2 font-bold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.78)"}}>Overview</p>
         {overviewItems.map(item => <NavBtn key={item.id} id={item.id} label={item.label} icon={item.icon} isActive={activeView===item.id} onClick={()=>onNavigate(item.id)}/>)}
       </div>
-      <div className="mx-3 my-1" style={{height:1,background:"rgba(109,40,217,0.07)"}}/>
+      <div className="mx-3 my-1" style={{height:1,background:"rgba(255,255,255,0.10)"}}/>
       <div className="p-3 flex-1 overflow-hidden">
-        <div className="flex items-center justify-between px-3 mb-2">
-          <p className="text-[10px] tracking-[0.24em] uppercase font-bold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.78)"}}>AI Agents</p>
-          <span className="text-[10px] font-bold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.78)"}}>{PROVIDERS.length}</span>
-        </div>
-        <div className="space-y-1.5">
-          {PROVIDERS.map((p,i)=>{
-            const viewId=`agent-${p.id}`;
-            const isActive=activeView===viewId;
-            const color=ACCENT[p.id as ProviderId];
-            const status = health[p.id];
-            const online = status?.reachable === true;
-            const configured = status?.configured !== false;
-            const statusLabel = online ? "Online" : configured ? "Standby" : "Setup";
-            const statusColor = online ? "#00A676" : configured ? "#6D28D9" : "#EF4444";
-            return (
-              <motion.button type="button" key={p.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.18+i*0.05}} onClick={()=>onNavigate(viewId)} className="group relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?`linear-gradient(90deg, rgba(${p.accentRgb},0.36), rgba(${p.accentRgb},0.14))`:"rgba(255,255,255,0.04)",border:isActive?`1px solid rgba(255,255,255,0.26)`:"1px solid rgba(255,255,255,0.08)",boxShadow:isActive?`0 0 18px rgba(${p.accentRgb},0.20)`:"none",cursor:"pointer"}} whileHover={{background:`rgba(${p.accentRgb},0.18)`,x:1}} whileTap={{scale:0.98}}>
-                {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full" style={{background:color}} transition={{type:"spring",stiffness:450,damping:35}}/>}
-                <div className="relative shrink-0">
-                  <AgentAvatar provider={p.id as ProviderId} size={28}/>
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full" style={{background:statusColor,border:"1px solid rgba(52,35,22,0.95)",boxShadow:`0 0 8px ${statusColor}`}} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[16px] font-black leading-tight" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF",textShadow:"0 1px 10px rgba(0,0,0,0.28)"}}>{p.name}</div>
-                  <div className="text-[11px] truncate mt-0.5 font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.72)"}}>{p.modelLabel}</div>
-                </div>
-                <div className="hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{background:`rgba(${online ? "138,154,85" : configured ? "226,178,79" : "196,98,58"},0.08)`,border:`1px solid ${statusColor}33`}}>
-                  <span className="h-1.5 w-1.5 rounded-full" style={{background:statusColor}} />
-                  <span className="text-[8px] uppercase" style={{fontFamily:"var(--font-jetbrains)",color:statusColor}}>{statusLabel}</span>
-                </div>
-              </motion.button>
-            );
-          })}
-        </div>
+        <button type="button" aria-expanded={agentsOpen} onClick={()=>setAgentsOpen(open=>!open)} className="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.12)",cursor:"pointer"}}>
+          <div>
+            <p className="text-[10px] tracking-[0.24em] uppercase font-bold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.72)"}}>AI Agents</p>
+            <div className="mt-1 text-[17px] font-black leading-tight" style={{fontFamily:"var(--font-outfit)",color:"#FFFFFF",textShadow:"0 1px 10px rgba(0,0,0,0.28)"}}>Agentes en uso</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full px-2 py-1 text-[12px] font-black" style={{fontFamily:"var(--font-jetbrains)",color:"#FFFFFF",background:"rgba(139,28,246,0.34)",border:"1px solid rgba(255,255,255,0.14)"}}>{PROVIDERS.length}</span>
+            <motion.span animate={{rotate:agentsOpen?180:0}} transition={{duration:0.18}} style={{color:"#FFFFFF"}}><ChevronDown size={20}/></motion.span>
+          </div>
+        </button>
+        <AnimatePresence initial={false}>
+          {agentsOpen&&(
+            <motion.div className="mt-2 space-y-1.5 overflow-hidden" initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} transition={{duration:0.22,ease:[0.22,1,0.36,1]}}>
+              {PROVIDERS.map((p,i)=>{
+                const viewId=`agent-${p.id}`;
+                const isActive=activeView===viewId;
+                const color=ACCENT[p.id as ProviderId];
+                const status = health[p.id];
+                const online = status?.reachable === true;
+                const configured = status?.configured !== false;
+                const statusLabel = online ? "Online" : configured ? "Standby" : "Setup";
+                const statusColor = online ? "#00A676" : configured ? "#6D28D9" : "#EF4444";
+                return (
+                  <motion.button type="button" key={p.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.03+i*0.04}} onClick={()=>onNavigate(viewId)} className="group relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?`linear-gradient(90deg, rgba(${p.accentRgb},0.36), rgba(${p.accentRgb},0.14))`:"rgba(255,255,255,0.04)",border:isActive?`1px solid rgba(255,255,255,0.26)`:"1px solid rgba(255,255,255,0.08)",boxShadow:isActive?`0 0 18px rgba(${p.accentRgb},0.20)`:"none",cursor:"pointer"}} whileHover={{background:`rgba(${p.accentRgb},0.18)`,x:1}} whileTap={{scale:0.98}}>
+                    {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full" style={{background:color}} transition={{type:"spring",stiffness:450,damping:35}}/>}
+                    <div className="relative shrink-0">
+                      <AgentAvatar provider={p.id as ProviderId} size={28}/>
+                      <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full" style={{background:statusColor,border:"1px solid rgba(52,35,22,0.95)",boxShadow:`0 0 8px ${statusColor}`}} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[16px] font-black leading-tight" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF",textShadow:"0 1px 10px rgba(0,0,0,0.28)"}}>{p.name}</div>
+                      <div className="text-[11px] truncate mt-0.5 font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.72)"}}>{p.modelLabel}</div>
+                    </div>
+                    <div className="hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{background:`rgba(${online ? "138,154,85" : configured ? "226,178,79" : "196,98,58"},0.08)`,border:`1px solid ${statusColor}33`}}>
+                      <span className="h-1.5 w-1.5 rounded-full" style={{background:statusColor}} />
+                      <span className="text-[8px] uppercase" style={{fontFamily:"var(--font-jetbrains)",color:statusColor}}>{statusLabel}</span>
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      <div className="mx-3 mb-1" style={{height:1,background:"rgba(109,40,217,0.07)"}}/>
+      <div className="mx-3 mb-1" style={{height:1,background:"rgba(255,255,255,0.10)"}}/>
       <div className="p-3 pt-1">
         <NavBtn id="settings" label="Settings" icon={Settings} isActive={activeView==="settings"} onClick={()=>onNavigate("settings")}/>
         <div className="mt-3 p-3 rounded-xl" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.12)"}}>
