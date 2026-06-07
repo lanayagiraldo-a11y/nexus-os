@@ -25,7 +25,9 @@ body { height: 100%; overflow: hidden; background: radial-gradient(circle at 12%
 ::-webkit-scrollbar-thumb { background: rgba(109,40,217,0.42); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(139,28,246,0.62); }
 nextjs-portal { display: none !important; pointer-events: none !important; }
-.glass { background: rgba(255,255,255,0.76); backdrop-filter: blur(24px) saturate(1.28); -webkit-backdrop-filter: blur(24px) saturate(1.28); border: 1px solid rgba(109,40,217,0.14); box-shadow: 0 24px 74px rgba(109,40,217,0.18), 0 12px 34px rgba(7,24,46,0.10); }
+.glass { background: rgba(229,231,235,0.94); backdrop-filter: blur(24px) saturate(1.18); -webkit-backdrop-filter: blur(24px) saturate(1.18); border: 1px solid rgba(17,24,39,0.20); box-shadow: 0 24px 74px rgba(17,24,39,0.18), 0 12px 34px rgba(7,24,46,0.14); color: #111827; }
+.readability-strong, main { color: #111827; }
+main h1, main h2, main h3, main h4 { color: #0B1020; font-weight: 900; }
 .grid-bg { background-image: linear-gradient(rgba(109,40,217,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(139,28,246,0.05) 1px, transparent 1px); background-size: 44px 44px; }
 .dot-active { background:#00A676; box-shadow:0 0 0 0 rgba(0,166,118,0.4); animation: pulse-emerald 2s infinite; }
 .dot-processing { background:#6D28D9; animation: pulse-cyan 1.4s infinite; }

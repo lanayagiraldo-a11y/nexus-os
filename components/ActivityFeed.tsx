@@ -80,9 +80,9 @@ export default function ActivityFeed({collapsed=false,onToggle}:ActivityFeedProp
   }
 
   return(
-    <motion.div initial={{x:60,opacity:0}} animate={{x:0,opacity:1}} transition={{duration:0.5,delay:0.2,ease:[0.22,1,0.36,1]}} className="hidden xl:flex flex-col glass" style={{width:300,flexShrink:0,borderTop:"none",borderBottom:"none",borderRight:"none"}}>
+    <motion.div initial={{x:60,opacity:0}} animate={{x:0,opacity:1}} transition={{duration:0.5,delay:0.2,ease:[0.22,1,0.36,1]}} className="hidden xl:flex flex-col glass" style={{width:330,flexShrink:0,borderTop:"none",borderBottom:"none",borderRight:"none"}}>
       <div className="flex items-center justify-between p-4 pb-3" style={{borderBottom:"1px solid rgba(109,40,217,0.08)"}}>
-        <div className="flex items-center gap-2"><Activity size={13} style={{color:"#6D28D9"}}/><span className="text-[11px] font-semibold tracking-[0.15em] uppercase" style={{fontFamily:"var(--font-syne)",color:"#6D28D9"}}>Activity Feed</span></div>
+        <div className="flex items-center gap-2"><Activity size={15} style={{color:"#6D28D9"}}/><span className="text-[13px] font-black tracking-[0.14em] uppercase" style={{fontFamily:"var(--font-syne)",color:"#4C1D95"}}>Activity Feed</span></div>
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-1.5"><motion.div className="w-1.5 h-1.5 rounded-full" style={{background:"#00A676"}} animate={{opacity:[1,0.3,1]}} transition={{duration:1.5,repeat:Infinity}}/><span className="text-[9px] tracking-widest" style={{fontFamily:"var(--font-jetbrains)",color:"#00A676"}}>LIVE</span></div>
           <motion.button whileHover={{scale:1.12}} whileTap={{scale:0.9}} onClick={onToggle} title="Collapse Activity Feed" className="w-6 h-6 rounded-md flex items-center justify-center" style={{background:"rgba(7,24,46,0.04)",border:"1px solid rgba(7,24,46,0.08)",cursor:"pointer"}}><PanelRightClose size={12} style={{color:"rgba(31,41,55,0.6)"}}/></motion.button>
@@ -97,11 +97,11 @@ export default function ActivityFeed({collapsed=false,onToggle}:ActivityFeedProp
                   <Icon size={11} style={{color:cfg.color,marginTop:2,flexShrink:0}}/>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-semibold tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:cfg.color}}>{ev.agent}</span>
+                      <span className="text-[12px] font-black tracking-wider" style={{fontFamily:"var(--font-jetbrains)",color:cfg.color}}>{ev.agent}</span>
                       <span className="text-[9px]" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.4)"}}>{relTime(ev.ts)}</span>
                     </div>
-                    <div className="text-[11px] mt-0.5 leading-snug" style={{fontFamily:"var(--font-outfit)",color:"rgba(226,232,240,0.92)"}}>{ev.message}</div>
-                    {ev.detail&&<div className="text-[10px] mt-1 flex items-center gap-1" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.6)"}}><ArrowRight size={8}/>{ev.detail}</div>}
+                    <div className="text-[14px] mt-1 leading-snug font-semibold" style={{fontFamily:"var(--font-outfit)",color:"#111827"}}>{ev.message}</div>
+                    {ev.detail&&<div className="text-[12px] mt-1 flex items-center gap-1 font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(17,24,39,0.76)"}}><ArrowRight size={8}/>{ev.detail}</div>}
                   </div>
                 </div>
               </div>

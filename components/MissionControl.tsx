@@ -47,7 +47,7 @@ function AgentCard({ prov, health, index, onOpen }: {
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: index * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="relative flex flex-col rounded-2xl overflow-hidden"
-      style={{ background: "rgba(247,239,226,0.9)", border: `1px solid rgba(${rgb},0.15)`, backdropFilter: "blur(16px)" }}
+      style={{ background: "rgba(229,231,235,0.96)", border: `1px solid rgba(${rgb},0.24)`, backdropFilter: "blur(16px)", boxShadow: "0 16px 42px rgba(17,24,39,0.10)" }}
       whileHover={{ y: -2, borderColor: `rgba(${rgb},0.35)`, boxShadow: `0 12px 40px rgba(${rgb},0.1)` }}
     >
       <div className="absolute inset-0 pointer-events-none"
@@ -59,10 +59,10 @@ function AgentCard({ prov, health, index, onOpen }: {
           <div className="flex items-center gap-3">
             <AgentAvatar provider={id} size={44} glow={health.status === "LIVE"} />
             <div>
-              <h3 className="text-lg font-black leading-tight" style={{ fontFamily: "var(--font-syne)", color: accent }}>
+              <h3 className="text-xl font-black leading-tight" style={{ fontFamily: "var(--font-syne)", color: accent }}>
                 {prov.name}
               </h3>
-              <p className="text-[11px] mt-0.5" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.55)" }}>
+              <p className="text-[13px] mt-0.5 font-semibold" style={{ fontFamily: "var(--font-outfit)", color: "rgba(17,24,39,0.82)" }}>
                 {role.title}
               </p>
             </div>
@@ -84,7 +84,7 @@ function AgentCard({ prov, health, index, onOpen }: {
           {role.uses.map(u => (
             <li key={u} className="flex items-start gap-2">
               <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background: `rgba(${rgb},0.6)` }} />
-              <span className="text-[12px] leading-snug" style={{ fontFamily: "var(--font-outfit)", color: "rgba(7,24,46,0.75)" }}>
+              <span className="text-[14px] leading-snug font-semibold" style={{ fontFamily: "var(--font-outfit)", color: "#111827" }}>
                 {u}
               </span>
             </li>
@@ -140,8 +140,8 @@ function SelfTile({ icon: Icon, label, description, color, rgb, delay, onClick }
         <Icon size={16} style={{ color }} />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[13px] font-bold" style={{ fontFamily: "var(--font-syne)", color }}>{label}</div>
-        <div className="text-[11px] mt-0.5 truncate" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.5)" }}>{description}</div>
+        <div className="text-[16px] font-black" style={{ fontFamily: "var(--font-syne)", color }}>{label}</div>
+        <div className="text-[13px] mt-0.5 truncate font-semibold" style={{ fontFamily: "var(--font-outfit)", color: "rgba(17,24,39,0.82)" }}>{description}</div>
       </div>
       <ChevronRight size={13} style={{ color: `rgba(${rgb},0.4)` }} />
     </motion.button>
@@ -190,7 +190,7 @@ export default function MissionControl({ onOpenAgent, onNavigate }: MissionContr
 
         <div className="flex items-center gap-3 -mb-1">
           <div className="w-1 h-4 rounded-full" style={{ background: "#6D28D9" }} />
-          <span className="text-[10px] font-semibold tracking-[0.18em] uppercase"
+          <span className="text-[12px] font-black tracking-[0.16em] uppercase"
             style={{ fontFamily: "var(--font-syne)", color: "#6D28D9" }}>
             Command Center
           </span>
@@ -201,12 +201,12 @@ export default function MissionControl({ onOpenAgent, onNavigate }: MissionContr
         <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight"
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight"
               style={{ fontFamily: "var(--font-syne)", color: "#07182E", letterSpacing: "-0.02em" }}>
               {greeting}, Liliana 👋
             </h1>
-            <p className="text-[13px] mt-1"
-              style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.5)" }}>
+            <p className="text-[16px] mt-1 font-semibold"
+              style={{ fontFamily: "var(--font-outfit)", color: "rgba(17,24,39,0.82)" }}>
               {liveCount === 0 ? "Configurando agentes…" : `${liveCount} agente${liveCount > 1 ? "s" : ""} listo${liveCount > 1 ? "s" : ""} para trabajar`}
             </p>
           </div>
@@ -251,7 +251,7 @@ export default function MissionControl({ onOpenAgent, onNavigate }: MissionContr
         <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-1 h-4 rounded-full" style={{ background: "#F72585" }} />
-            <span className="text-[10px] font-semibold tracking-[0.18em] uppercase"
+            <span className="text-[12px] font-black tracking-[0.16em] uppercase"
               style={{ fontFamily: "var(--font-syne)", color: "#F72585" }}>
               Tus herramientas personales
             </span>
