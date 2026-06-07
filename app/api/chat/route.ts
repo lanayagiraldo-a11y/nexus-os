@@ -218,8 +218,17 @@ async function streamHermes(messages: ChatMessage[]): Promise<Response> {
   });
 }
 
+function normalizeMessages(payload: { messages?: ChatMessage[]; message?: string }): ChatMessage[] {
+  if (Array.isArray(payload.messages) && payload.messages.length > 0) return payload.messages;
+  const text = typeof payload.message === "string" ? payload.message.trim() : "";
+  return text ? [{ role: "user", content: text }] : [];
+}
+
 export async function POST(req: NextRequest) {
-  const { provider, messages } = await req.json();
+  const payload = await req.json();
+  const { provider } = payload;
+  const messages = normalizeMessages(payload);
+  if (!messages.length) return Response.json({ error: "Missing message" }, { status: 400 });
   switch (provider) {
     case "claude": return streamClaude(messages);
     case "openai": return streamOpenAI(messages);
