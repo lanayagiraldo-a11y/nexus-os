@@ -78,23 +78,35 @@ async function streamOpenAI(messages: ChatMessage[]): Promise<Response> {
 async function streamGemini(messages: ChatMessage[]): Promise<Response> {
   if (!process.env.GEMINI_API_KEY) return Response.json({ error: "GEMINI_API_KEY not set" }, { status: 401 });
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash" });
+  const requestedModel = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+  const modelNames = Array.from(new Set([requestedModel, "gemini-2.0-flash", "gemini-1.5-flash"]));
   return sseStream(async (ctrl) => {
-    try {
-      const history = messages.slice(0, -1).map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
-      const chat = model.startChat({
-        history,
-        systemInstruction: { role: "user", parts: [{ text: "You are Gemini inside NEXUS OS for Liliana: research, real-time search and multimodal analysis. Respond in Spanish unless asked otherwise." }] },
-      });
-      const result = await chat.sendMessageStream(messages[messages.length - 1]?.content ?? "");
-      for await (const chunk of result.stream) {
-        const text = chunk.text();
-        if (text) send(ctrl, { text });
+    const history = messages.slice(0, -1).map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
+    const prompt = messages[messages.length - 1]?.content ?? "";
+    const errors: string[] = [];
+
+    for (const modelName of modelNames) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const chat = model.startChat({
+          history,
+          systemInstruction: { role: "user", parts: [{ text: "You are Gemini inside NEXUS OS for Liliana: research, real-time search and multimodal analysis. Respond in Spanish unless asked otherwise." }] },
+        });
+        const result = await chat.sendMessageStream(prompt);
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          if (text) send(ctrl, { text });
+        }
+        send(ctrl, { done: true, model: modelName });
+        return;
+      } catch (error) {
+        const message = String(error);
+        errors.push(`${modelName}: ${message}`);
+        if (message.includes("API_KEY_INVALID")) break;
       }
-      send(ctrl, { done: true });
-    } catch (error) {
-      send(ctrl, { error: String(error) });
     }
+
+    send(ctrl, { error: errors.join("\n") || "Gemini unavailable" });
   });
 }
 
