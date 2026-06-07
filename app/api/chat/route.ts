@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getHermesApiKey, getHermesBaseUrl, getHermesModel, getHermesSessionKey } from "@/lib/nexusConfig";
@@ -44,23 +43,59 @@ function send(controller: ReadableStreamDefaultController, data: object) {
 async function streamClaude(messages: ChatMessage[]): Promise<Response> {
   const key = process.env.CLAUDE_API_KEY ?? process.env.ANTHROPIC_API_KEY;
   if (!key) return Response.json({ error: "CLAUDE_API_KEY not set" }, { status: 401 });
-  const client = new Anthropic({ apiKey: key });
   return sseStream(async (ctrl) => {
     try {
-      const s = client.messages.stream({
-        model: process.env.CLAUDE_MODEL ?? "claude-sonnet-4-6",
-        max_tokens: 4096,
-        system: "You are Claude, the finance, strategy and code core inside NEXUS OS for Liliana. Respond in Spanish unless asked otherwise.",
-        messages,
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": key,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: process.env.CLAUDE_MODEL ?? "claude-sonnet-4-6",
+          max_tokens: 4096,
+          stream: true,
+          system: "You are Claude, the finance, strategy and code core inside NEXUS OS for Liliana. Respond in Spanish unless asked otherwise.",
+          messages,
+        }),
+        signal: AbortSignal.timeout(180_000),
       });
-      for await (const chunk of s) {
-        if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") send(ctrl, { text: chunk.delta.text });
+
+      if (!resp.ok || !resp.body) {
+        const body = await resp.text();
+        if (resp.status === 401 || body.includes("authentication_error")) send(ctrl, { error: "Claude no pudo autenticarse con la llave de producción. Actualiza CLAUDE_API_KEY/ANTHROPIC_API_KEY en Netlify." });
+        else if (body.includes("not_found_error") || body.includes("model")) send(ctrl, { error: "El modelo Claude configurado no está disponible para esta llave. Cambia CLAUDE_MODEL en Netlify." });
+        else send(ctrl, { error: `Claude ${resp.status}: ${body.slice(0, 420)}` });
+        return;
       }
-      const final = await s.finalMessage();
-      send(ctrl, { done: true, usage: { input: final.usage.input_tokens, output: final.usage.output_tokens } });
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let inputTokens: number | undefined;
+      let outputTokens: number | undefined;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+        for (const event of events) {
+          const line = event.split("\n").find((l) => l.startsWith("data: "));
+          if (!line) continue;
+          const raw = line.slice(6).trim();
+          if (!raw || raw === "[DONE]") continue;
+          const data = JSON.parse(raw) as { type?: string; delta?: { type?: string; text?: string }; usage?: { input_tokens?: number; output_tokens?: number } };
+          if (data.type === "message_start") inputTokens = data.usage?.input_tokens;
+          if (data.type === "content_block_delta" && data.delta?.type === "text_delta" && data.delta.text) send(ctrl, { text: data.delta.text });
+          if (data.type === "message_delta") outputTokens = data.usage?.output_tokens;
+          if (data.type === "message_stop") send(ctrl, { done: true, usage: { input: inputTokens, output: outputTokens } });
+        }
+      }
     } catch (error) {
       const message = String(error);
-      if (message.includes("401 status code")) send(ctrl, { error: "Claude no pudo autenticarse con la llave de producción. Actualiza CLAUDE_API_KEY/ANTHROPIC_API_KEY en Netlify." });
+      if (message.includes("401 status code") || message.includes("authentication_error")) send(ctrl, { error: "Claude no pudo autenticarse con la llave de producción. Actualiza CLAUDE_API_KEY/ANTHROPIC_API_KEY en Netlify." });
       else send(ctrl, { error: message });
     }
   });
