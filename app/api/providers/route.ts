@@ -57,6 +57,21 @@ export async function GET() {
       const { ok, latency, error } = await pingUrl(`${hermesBaseUrl}/v1/models`, { Authorization: `Bearer ${key}` });
       return { id: "hermes", configured: true, reachable: ok, latency, error };
     })(),
+    (async (): Promise<ProviderHealth> => {
+      const workspacePath = process.env.ANTIGRAVITY_WORKSPACE_PATH;
+      if (!workspacePath) return { id: "antigravity", configured: false, reachable: null, latency: null };
+
+      // Google Antigravity is an external IDE/workspace rather than a chat API.
+      // Keep it visible in the fleet, but do not mark it online until a real
+      // bridge exists; otherwise the UI would imply NEXUS can chat with it.
+      return {
+        id: "antigravity",
+        configured: true,
+        reachable: false,
+        latency: null,
+        error: "External IDE workspace configured; chat bridge pending",
+      };
+    })(),
   ]);
 
   return NextResponse.json({

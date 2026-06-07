@@ -72,8 +72,8 @@ const CONTEXT_OPTIONS: Array<{ type: ContextType; label: string; icon: typeof Fi
   { type: "pasted", label: "Texto pegado", icon: ClipboardCheck, hint: "Pega acta, correo, contrato o WhatsApp" },
 ];
 
-const ACCENT: Record<ProviderId, string> = { claude: "#F72585", openai: "#00A676", gemini: "#5F8C94", hermes: "#6D28D9" };
-const ACCENT_RGB: Record<ProviderId, string> = { claude: "209,132,73", openai: "138,154,85", gemini: "95,140,148", hermes: "226,178,79" };
+const ACCENT: Record<ProviderId, string> = { claude: "#F72585", openai: "#00A676", gemini: "#5F8C94", hermes: "#6D28D9", antigravity: "#4F46E5" };
+const ACCENT_RGB: Record<ProviderId, string> = { claude: "209,132,73", openai: "138,154,85", gemini: "95,140,148", hermes: "226,178,79", antigravity: "79,70,229" };
 
 function MarkdownLike({ text }: { text: string }) {
   return (

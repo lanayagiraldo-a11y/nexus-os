@@ -33,11 +33,28 @@ function HermesIcon({size}:{size:number}) {
     <circle cx="12" cy="6" r="2" fill="#6D28D9" opacity="0.9"/>
   </svg>;
 }
+function AntigravityIcon({size}:{size:number}) {
+  const s=size*0.54;
+  return <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+    <defs>
+      <linearGradient id="ag" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#38BDF8"/>
+        <stop offset="55%" stopColor="#4F46E5"/>
+        <stop offset="100%" stopColor="#A855F7"/>
+      </linearGradient>
+    </defs>
+    <path d="M12 2.5L19.5 8.2L16.7 20.5H7.3L4.5 8.2L12 2.5Z" stroke="url(#ag)" strokeWidth="1.6" strokeLinejoin="round"/>
+    <path d="M8.1 12.3L12 6.6L15.9 12.3L12 17.4L8.1 12.3Z" fill="url(#ag)" opacity="0.78"/>
+    <path d="M5.4 8.8C8.2 10.2 15.8 10.2 18.6 8.8" stroke="#38BDF8" strokeWidth="1.1" strokeLinecap="round" opacity="0.75"/>
+    <circle cx="12" cy="12" r="1.45" fill="#F7EFE2" opacity="0.95"/>
+  </svg>;
+}
 const CFG: Record<ProviderId,{bg:string;border:string;shadow:string;Icon:React.ComponentType<{size:number}>}> = {
   claude:  {bg:"radial-gradient(circle at 35% 35%, rgba(247,37,133,0.25), rgba(124,58,237,0.1))",  border:"rgba(247,37,133,0.35)", shadow:"0 0 24px rgba(247,37,133,0.3),0 0 48px rgba(247,37,133,0.1)", Icon:ClaudeIcon},
   openai:  {bg:"radial-gradient(circle at 35% 35%, rgba(0,166,118,0.2), rgba(0,166,118,0.08))",   border:"rgba(0,166,118,0.35)",  shadow:"0 0 24px rgba(0,166,118,0.3),0 0 48px rgba(0,166,118,0.1)",  Icon:OpenAIIcon},
   gemini:  {bg:"radial-gradient(circle at 35% 35%, rgba(247,37,133,0.2), rgba(247,37,133,0.08))",   border:"rgba(247,37,133,0.35)",  shadow:"0 0 24px rgba(247,37,133,0.3),0 0 48px rgba(247,37,133,0.1)",  Icon:GeminiIcon},
   hermes:  {bg:"radial-gradient(circle at 35% 35%, rgba(109,40,217,0.2), rgba(247,37,133,0.08))",   border:"rgba(109,40,217,0.35)",  shadow:"0 0 24px rgba(109,40,217,0.3),0 0 48px rgba(109,40,217,0.1)",  Icon:HermesIcon},
+  antigravity:{bg:"radial-gradient(circle at 35% 35%, rgba(79,70,229,0.22), rgba(56,189,248,0.08))",border:"rgba(79,70,229,0.36)",shadow:"0 0 24px rgba(79,70,229,0.28),0 0 48px rgba(56,189,248,0.12)",Icon:AntigravityIcon},
 };
 export default function AgentAvatar({provider,size=48,glow=false,pulse=false}:AvatarProps) {
   const cfg=CFG[provider]; const {Icon}=cfg;

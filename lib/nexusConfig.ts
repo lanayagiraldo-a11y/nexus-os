@@ -1,4 +1,4 @@
-export type ProviderId = "claude" | "openai" | "gemini" | "hermes";
+export type ProviderId = "claude" | "openai" | "gemini" | "hermes" | "antigravity";
 
 export interface NexusProviderConfig {
   id: ProviderId;
@@ -123,6 +123,24 @@ export const NEXUS_CONFIG = {
       defaultBaseUrl: "http://127.0.0.1:8642",
       roleTitle: "Segundo cerebro · Obsidian · Herramientas",
       uses: ["Memoria y contexto personal", "Archivos y Obsidian", "Automatizaciones con herramientas"],
+    },
+    {
+      id: "antigravity",
+      name: "Antigravity",
+      fullName: "Google Antigravity",
+      model: "antigravity-workspace",
+      modelLabel: "IDE Agent",
+      provider: "Google",
+      accent: "#4F46E5",
+      accentRgb: "79,70,229",
+      icon: "🛰️",
+      description: "Workspace agent · IDE orchestration",
+      contextWindow: "workspace",
+      envKey: "ANTIGRAVITY_WORKSPACE_PATH",
+      bridge: "external-ide",
+      commandLabel: "External workspace · chat bridge pending",
+      roleTitle: "Código · IDE · Multi-agente",
+      uses: ["Proyectos de código", "Orquestación desde IDE", "Exploración técnica en workspace"],
     },
   ] satisfies NexusProviderConfig[],
 } as const;

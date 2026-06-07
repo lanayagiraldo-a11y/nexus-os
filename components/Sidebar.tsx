@@ -6,7 +6,7 @@ import AgentAvatar from "./AgentAvatar";
 import { PROVIDERS } from "@/lib/providers";
 import type { ProviderId } from "@/lib/providers";
 
-const ACCENT: Record<ProviderId,string> = { claude:"#F72585", openai:"#00A676", gemini:"#5F8C94", hermes:"#A855F7" };
+const ACCENT: Record<ProviderId,string> = { claude:"#F72585", openai:"#00A676", gemini:"#5F8C94", hermes:"#A855F7", antigravity:"#4F46E5" };
 
 interface SidebarProps { activeView: string; onViewChange: (v:string)=>void; }
 interface ProviderHealth { id: ProviderId; configured?: boolean; reachable?: boolean; error?: string; }
