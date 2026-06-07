@@ -48,7 +48,9 @@ Notas:
 - API de estado: `GET /api/providers` responde HTTP 200 con 4 agentes: Claude, ChatGPT, Gemini, Hermes. Hermes aparece `configured: true`, `reachable: true`, `bridge: hermes-api-server`.
 - Smoke test directo: `POST /api/chat` con `provider=hermes` devolvió por SSE `OK Hermi conectado`.
 - Smoke test Mission Control: `POST /api/orchestrate` con `agents:["hermes"]` devolvió resultado `completed` y síntesis ejecutiva.
-- URL pública temporal Cloudflare actual: `https://aerial-born-address-despite.trycloudflare.com` — HTTP 200, `/api/providers` verificado y `/api/orchestrate` probado públicamente con Hermes y con comité completo.
+- URL pública estable Netlify: `https://nexus-os-liliana.netlify.app` — HTTP 200, página principal contiene `NEXUS`, y `/api/providers` responde HTTP 200.
+- Admin Netlify: `https://app.netlify.com/projects/nexus-os-liliana`.
+- Estado Netlify: sitio creado bajo cuenta `lanayagiraldo` / equipo `Financiero`; deploy productivo manual publicado. El sitio todavía no está conectado a GitHub automático (`repo: null` en Netlify).
 
 ## Cambios clave de esta pasada
 
