@@ -38,7 +38,7 @@ const overviewItems = [
 ];
 
 function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavigate:(v:string)=>void;health:Record<string,ProviderHealth>}) {
-  const [agentsOpen, setAgentsOpen] = useState(activeView.startsWith("agent-"));
+  const [agentsOpen, setAgentsOpen] = useState(true);
 
   useEffect(() => {
     if (activeView.startsWith("agent-")) setAgentsOpen(true);
@@ -47,24 +47,19 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
   return (
     <>
       <div className="p-3 pb-2">
-        <p className="text-[12px] tracking-[0.20em] uppercase px-3 mb-2 font-black" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.90)"}}>Overview</p>
-        {overviewItems.map(item => <NavBtn key={item.id} id={item.id} label={item.label} icon={item.icon} isActive={activeView===item.id} onClick={()=>onNavigate(item.id)}/>)}
-      </div>
-      <div className="mx-3 my-1" style={{height:1,background:"rgba(255,255,255,0.10)"}}/>
-      <div className="p-3 flex-1 overflow-hidden">
-        <button type="button" aria-expanded={agentsOpen} onClick={()=>setAgentsOpen(open=>!open)} className="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left" style={{background:"rgba(255,255,255,0.09)",border:"1px solid rgba(255,255,255,0.20)",cursor:"pointer"}}>
+        <button type="button" aria-expanded={agentsOpen} onClick={()=>setAgentsOpen(open=>!open)} className="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left" style={{background:"rgba(255,255,255,0.10)",border:"1px solid rgba(255,255,255,0.24)",cursor:"pointer"}}>
           <div>
-            <p className="text-[12px] tracking-[0.20em] uppercase font-black" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.90)"}}>AI Agents</p>
+            <p className="text-[12px] tracking-[0.20em] uppercase font-black" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.92)"}}>AI Agents</p>
             <div className="mt-1 text-[20px] font-black leading-tight" style={{fontFamily:"var(--font-outfit)",color:"#FFFFFF",textShadow:"0 2px 12px rgba(0,0,0,0.40)"}}>Agentes en uso</div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full px-2 py-1 text-[12px] font-black" style={{fontFamily:"var(--font-jetbrains)",color:"#FFFFFF",background:"rgba(139,28,246,0.34)",border:"1px solid rgba(255,255,255,0.14)"}}>{PROVIDERS.length}</span>
+            <span className="rounded-full px-2 py-1 text-[12px] font-black" style={{fontFamily:"var(--font-jetbrains)",color:"#FFFFFF",background:"rgba(139,28,246,0.42)",border:"1px solid rgba(255,255,255,0.20)"}}>{PROVIDERS.length}</span>
             <motion.span animate={{rotate:agentsOpen?180:0}} transition={{duration:0.18}} style={{color:"#FFFFFF"}}><ChevronDown size={20}/></motion.span>
           </div>
         </button>
         <AnimatePresence initial={false}>
           {agentsOpen&&(
-            <motion.div className="mt-2 space-y-1.5 overflow-hidden" initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} transition={{duration:0.22,ease:[0.22,1,0.36,1]}}>
+            <motion.div className="mt-2 space-y-1.5" initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} transition={{duration:0.22,ease:[0.22,1,0.36,1]}}>
               {PROVIDERS.map((p,i)=>{
                 const viewId=`agent-${p.id}`;
                 const isActive=activeView===viewId;
@@ -75,17 +70,17 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
                 const statusLabel = online ? "Online" : configured ? "Standby" : "Setup";
                 const statusColor = online ? "#00A676" : configured ? "#6D28D9" : "#EF4444";
                 return (
-                  <motion.button type="button" key={p.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.03+i*0.04}} onClick={()=>onNavigate(viewId)} className="group relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?`linear-gradient(90deg, rgba(${p.accentRgb},0.36), rgba(${p.accentRgb},0.14))`:"rgba(255,255,255,0.04)",border:isActive?`1px solid rgba(255,255,255,0.26)`:"1px solid rgba(255,255,255,0.08)",boxShadow:isActive?`0 0 18px rgba(${p.accentRgb},0.20)`:"none",cursor:"pointer"}} whileHover={{background:`rgba(${p.accentRgb},0.18)`,x:1}} whileTap={{scale:0.98}}>
+                  <motion.button type="button" key={p.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.03+i*0.04}} onClick={()=>onNavigate(viewId)} className="group relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?`linear-gradient(90deg, rgba(${p.accentRgb},0.36), rgba(${p.accentRgb},0.14))`:"rgba(255,255,255,0.05)",border:isActive?`1px solid rgba(255,255,255,0.30)`:"1px solid rgba(255,255,255,0.10)",boxShadow:isActive?`0 0 18px rgba(${p.accentRgb},0.20)`:"none",cursor:"pointer"}} whileHover={{background:`rgba(${p.accentRgb},0.18)`,x:1}} whileTap={{scale:0.98}}>
                     {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full" style={{background:color}} transition={{type:"spring",stiffness:450,damping:35}}/>}
                     <div className="relative shrink-0">
-                      <AgentAvatar provider={p.id as ProviderId} size={28}/>
+                      <AgentAvatar provider={p.id as ProviderId} size={30}/>
                       <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full" style={{background:statusColor,border:"1px solid rgba(52,35,22,0.95)",boxShadow:`0 0 8px ${statusColor}`}} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[18px] font-black leading-tight" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF",textShadow:"0 2px 12px rgba(0,0,0,0.40)"}}>{p.name}</div>
                       <div className="text-[13px] truncate mt-0.5 font-bold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.86)"}}>{p.modelLabel}</div>
                     </div>
-                    <div className="hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{background:`rgba(${online ? "138,154,85" : configured ? "226,178,79" : "196,98,58"},0.08)`,border:`1px solid ${statusColor}33`}}>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{background:`rgba(${online ? "138,154,85" : configured ? "226,178,79" : "196,98,58"},0.08)`,border:`1px solid ${statusColor}33`}}>
                       <span className="h-1.5 w-1.5 rounded-full" style={{background:statusColor}} />
                       <span className="text-[8px] uppercase" style={{fontFamily:"var(--font-jetbrains)",color:statusColor}}>{statusLabel}</span>
                     </div>
@@ -95,6 +90,11 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+      <div className="mx-3 my-1" style={{height:1,background:"rgba(255,255,255,0.10)"}}/>
+      <div className="p-3 pb-2">
+        <p className="text-[12px] tracking-[0.20em] uppercase px-3 mb-2 font-black" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.90)"}}>Overview</p>
+        {overviewItems.map(item => <NavBtn key={item.id} id={item.id} label={item.label} icon={item.icon} isActive={activeView===item.id} onClick={()=>onNavigate(item.id)}/>)}
       </div>
       <div className="mx-3 mb-1" style={{height:1,background:"rgba(255,255,255,0.10)"}}/>
       <div className="p-3 pt-1">
