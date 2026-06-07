@@ -141,7 +141,7 @@ export default function Sidebar({activeView,onViewChange}:SidebarProps) {
 
   return (
     <>
-      <motion.aside initial={{x:-80,opacity:0}} animate={{x:0,opacity:1}} transition={{duration:0.5,delay:0.1,ease:[0.22,1,0.36,1]}} className="hidden md:flex flex-col overflow-y-auto" style={{width:260,flexShrink:0,background:"linear-gradient(180deg, rgba(40,24,54,0.98), rgba(52,35,22,0.98))",borderRight:"1px solid rgba(255,255,255,0.14)",backdropFilter:"blur(20px)"}}>
+      <motion.aside initial={false} animate={{x:0,opacity:1}} transition={{duration:0.3,ease:[0.22,1,0.36,1]}} className="hidden md:flex flex-col overflow-y-auto" style={{width:260,flexShrink:0,background:"linear-gradient(180deg, rgba(40,24,54,0.98), rgba(52,35,22,0.98))",borderRight:"1px solid rgba(255,255,255,0.14)",backdropFilter:"blur(20px)"}}>
         <SidebarContent activeView={activeView} onNavigate={navigate} health={health}/>
       </motion.aside>
 
