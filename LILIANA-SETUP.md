@@ -81,9 +81,19 @@ Notas:
 - Se convirtió el `Orquestador` en `Consejo de agentes + selector de contexto + panel de ejecución`: ahora permite elegir contexto (sin contexto, daily note, carpetas/proyectos de Obsidian, ruta de archivo/carpeta o texto pegado), convocar/desconvocar agentes, enviar la misión con ese contexto y ejecutar la síntesis con botones reales para `Guardar síntesis`, `Crear pendientes`, `Guardar + tareas` o `Copiar`.
 - `/api/orchestrate` ahora acepta `context` y lee contexto seguro desde `OBSIDIAN_VAULT_PATH` (daily note o rutas dentro de la bóveda, con límite y formatos `.md/.txt/.csv/.json`) antes de llamar al consejo. También acepta `type: "url"` para leer links externos públicos (web, raw text, Google Docs/Sheets/Slides exportables, Google Drive público y OneDrive público básico); bloquea links locales/privados y avisa cuando el archivo requiere login. `/api/obsidian` ahora acepta `type: "orchestration"` para guardar síntesis y crear checkboxes en la daily note.
 
+## Verificación adicional — 2026-06-07
+
+- Hermes/Hermi quedó activado también en Netlify con `HERMES_BASE_URL`, `HERMES_MODEL` y `HERMES_API_KEY` en contexto `production` y scopes `builds`, `functions`, `runtime`.
+- `HERMES_BASE_URL` apunta temporalmente a un Cloudflare quick tunnel hacia el Hermes API Server local (`127.0.0.1:8642`). **No es estable**: si se reinicia el túnel, hay que actualizar `HERMES_BASE_URL` en Netlify y redeploy.
+- Verificado: Hermes API público `/v1/models` responde con `hermes-agent` usando bearer token.
+- `npm run build`: OK.
+- Servidor local `http://127.0.0.1:3100`: `/api/providers` muestra Claude, ChatGPT, Gemini y Hermes configurados y `reachable: true`; `POST /api/chat` con `provider=hermes` devolvió `OK Hermi conectado a NEXUS`.
+- Netlify deploy productivo publicado: `https://nexus-os-liliana.netlify.app`.
+- Verificado público por HTTP: página principal contiene `NEXUS OS`; `/api/providers` muestra Hermes `configured: true`, `reachable: true`, `bridge: hermes-api-server`; `POST /api/chat` con `provider=hermes` devolvió `OK Hermi conectado a NEXUS público`.
+
 ## Pendiente recomendado
 
-1. Implementar Setup Wizard visual para validar variables faltantes y rutas locales.
-2. Conectar Analytics a datos reales.
-3. Implementar Memory view con historial de chats desde Obsidian.
-4. Preparar deploy Netlify y verificar URL pública estable.
+1. Cambiar el Cloudflare quick tunnel por una URL estable para Hermes API Server (subdominio/VPS/named tunnel) y actualizar `HERMES_BASE_URL` en Netlify.
+2. Implementar Setup Wizard visual para validar variables faltantes y rutas locales.
+3. Conectar Analytics a datos reales.
+4. Implementar Memory view con historial de chats desde Obsidian.
