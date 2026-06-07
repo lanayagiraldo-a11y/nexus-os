@@ -26,7 +26,6 @@ export const ORCHESTRATOR_ROLES: Record<ProviderId, string> = {
   openai: "Productor/redactor: convierte la misión en piezas accionables, copys, guiones, emails o entregables claros.",
   gemini: "Explorador creativo: propone ángulos, tendencias, variaciones, benchmarks e ideas alternativas.",
   hermes: "Segundo cerebro de Liliana: conecta con su contexto, empresas, Obsidian, marketing anti-caos y próximos pasos seguros.",
-  antigravity: "Agente IDE externo: revisa arquitectura, tareas de código y coordinación técnica; no ejecuta hasta que exista puente real con el workspace.",
 };
 
 export const MODE_LABELS: Record<string, string> = {
@@ -118,7 +117,6 @@ async function callProvider(provider: ProviderId, prompt: string): Promise<strin
     case "openai": return callOpenAI(prompt);
     case "gemini": return callGemini(prompt);
     case "hermes": return callHermes(prompt);
-    case "antigravity": throw new Error("Antigravity is registered as an external IDE workspace; no NEXUS chat/orchestrator bridge is configured yet.");
   }
 }
 

@@ -6,8 +6,8 @@ import AgentAvatar from"./AgentAvatar";
 import{PROVIDERS}from"@/lib/providers";
 import type{ProviderId,ProviderDef}from"@/lib/providers";
 export interface ProviderHealth{id?:string;configured:boolean;reachable:boolean|null;latency:number|null;}
-const TAGLINES:Record<ProviderId,string>={claude:"Reasoning, deep code & nuanced writing",openai:"Versatile intelligence across every domain",gemini:"Multimodal speed — text, images & beyond",hermes:"VPS-hosted · private · blazing fast",antigravity:"External IDE workspace · code orchestration"};
-const MESH:Record<ProviderId,string>={claude:"radial-gradient(ellipse at 20% 20%,rgba(247,37,133,0.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(109,40,217,0.08) 0%,transparent 60%)",openai:"radial-gradient(ellipse at 20% 20%,rgba(0,166,118,0.1) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(16,163,127,0.07) 0%,transparent 60%)",gemini:"radial-gradient(ellipse at 20% 20%,rgba(247,37,133,0.1) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(109,40,217,0.07) 0%,transparent 60%)",hermes:"radial-gradient(ellipse at 20% 20%,rgba(109,40,217,0.1) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(245,158,11,0.07) 0%,transparent 60%)",antigravity:"radial-gradient(ellipse at 20% 20%,rgba(56,189,248,0.10) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(79,70,229,0.10) 0%,transparent 60%)"};
+const TAGLINES:Record<ProviderId,string>={claude:"Reasoning, deep code & nuanced writing",openai:"Versatile intelligence across every domain",gemini:"Multimodal speed — text, images & beyond",hermes:"VPS-hosted · private · blazing fast"};
+const MESH:Record<ProviderId,string>={claude:"radial-gradient(ellipse at 20% 20%,rgba(247,37,133,0.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(109,40,217,0.08) 0%,transparent 60%)",openai:"radial-gradient(ellipse at 20% 20%,rgba(0,166,118,0.1) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(16,163,127,0.07) 0%,transparent 60%)",gemini:"radial-gradient(ellipse at 20% 20%,rgba(247,37,133,0.1) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(109,40,217,0.07) 0%,transparent 60%)",hermes:"radial-gradient(ellipse at 20% 20%,rgba(109,40,217,0.1) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(245,158,11,0.07) 0%,transparent 60%)"};
 const EMPTY:ProviderHealth={configured:false,reachable:null,latency:null};
 function StatusBadge({health,accent,accentRgb}:{health:ProviderHealth;accent:string;accentRgb:string}){
   const st=!health.configured?"key":health.reachable===null?"checking":health.reachable?"online":"offline";
@@ -43,7 +43,7 @@ function AgentCard({provider,health,msgCount,index,onOpen}:{provider:ProviderDef
   );
 }
 export default function AgentFleet({onOpenAgent,messageCounts}:{onOpenAgent:(id:ProviderId)=>void;messageCounts:Record<string,number>}){
-  const[health,setHealth]=useState<Record<string,ProviderHealth>>({claude:EMPTY,openai:EMPTY,gemini:EMPTY,hermes:EMPTY,antigravity:EMPTY});
+  const[health,setHealth]=useState<Record<string,ProviderHealth>>({claude:EMPTY,openai:EMPTY,gemini:EMPTY,hermes:EMPTY});
   const[checking,setChecking]=useState(false);const[lastChecked,setLastChecked]=useState("");
   const check=async()=>{setChecking(true);try{const r=await fetch("/api/providers");if(r.ok){const d=await r.json();const m:Record<string,ProviderHealth>={};for(const p of d.providers)m[p.id]=p;setHealth(m);setLastChecked(new Date().toLocaleTimeString("en-US",{hour12:false}));}}catch{}finally{setChecking(false);}};
   useEffect(()=>{check();const t=setInterval(check,30_000);return()=>clearInterval(t);},[]);
@@ -65,7 +65,7 @@ export default function AgentFleet({onOpenAgent,messageCounts}:{onOpenAgent:(id:
       <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.45}} className="rounded-xl p-4" style={{background:"rgba(109,40,217,0.03)",border:"1px solid rgba(109,40,217,0.08)"}}>
         <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-2.5" style={{fontFamily:"var(--font-syne)",color:"rgba(109,40,217,0.5)"}}>Setup · .env.local</p>
         <div className="grid grid-cols-2 gap-x-8 gap-y-1">
-          {[{key:"CLAUDE_API_KEY",val:"sk-ant-...",color:"#F72585"},{key:"OPENAI_API_KEY",val:"sk-proj-...",color:"#00A676"},{key:"GEMINI_API_KEY",val:"AIza...",color:"#5F8C94"},{key:"HERMES_BASE_URL",val:"https://...",color:"#6D28D9"},{key:"ANTIGRAVITY_WORKSPACE_PATH",val:"/path/to/project",color:"#4F46E5"}].map(({key,val,color})=>(
+          {[{key:"CLAUDE_API_KEY",val:"sk-ant-...",color:"#F72585"},{key:"OPENAI_API_KEY",val:"sk-proj-...",color:"#00A676"},{key:"GEMINI_API_KEY",val:"AIza...",color:"#5F8C94"},{key:"HERMES_BASE_URL",val:"https://...",color:"#6D28D9"}].map(({key,val,color})=>(
             <div key={key} className="text-[11px]" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(31,41,55,0.45)"}}><span style={{color}}>{key}</span>=<span>{val}</span></div>
           ))}
         </div>

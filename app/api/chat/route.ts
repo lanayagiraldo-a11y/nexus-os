@@ -175,7 +175,6 @@ export async function POST(req: NextRequest) {
     case "openai": return streamOpenAI(messages);
     case "gemini": return streamGemini(messages);
     case "hermes": return streamHermes(messages);
-    case "antigravity": return Response.json({ error: "Antigravity is an external IDE workspace. NEXUS has the agent card, but no chat bridge is configured yet." }, { status: 501 });
     default: return Response.json({ error: "Unknown provider" }, { status: 400 });
   }
 }

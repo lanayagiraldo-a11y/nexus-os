@@ -25,11 +25,10 @@ const ROLE: Record<ProviderId, { title: string; uses: string[] }> = {
   openai:  { title: "Marketing · Contenido · Emails",   uses: ["Copys y campañas Buzzi", "Emails profesionales", "Ideas creativas y resúmenes"] },
   gemini:  { title: "Research · Búsqueda en tiempo real", uses: ["Comparativos y benchmarks", "Noticias y tendencias", "Datos de mercado actualizados"] },
   hermes:  { title: "Segundo cerebro · Obsidian · Herramientas", uses: ["Memoria y contexto personal", "Archivos y Obsidian", "Automatizaciones con herramientas"] },
-  antigravity: { title: "IDE · Código · Multi-agente", uses: ["Workspace de desarrollo", "Planificación técnica", "Orquestación de agentes de código"] },
 };
 
 const ACCENT: Record<ProviderId, string> = {
-  claude: "#F72585", openai: "#00A676", gemini: "#5F8C94", hermes: "#6D28D9", antigravity: "#4F46E5",
+  claude: "#F72585", openai: "#00A676", gemini: "#5F8C94", hermes: "#6D28D9",
 };
 
 function AgentCard({ prov, health, index, onOpen }: {
@@ -160,7 +159,6 @@ export default function MissionControl({ onOpenAgent, onNavigate }: MissionContr
     openai: { status: "CHECKING", configured: false },
     gemini: { status: "CHECKING", configured: false },
     hermes: { status: "CHECKING", configured: false },
-    antigravity: { status: "CHECKING", configured: false },
   });
 
   const checkHealth = async () => {

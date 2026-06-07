@@ -11,16 +11,15 @@ import{emitNexusEvent}from"@/lib/nexusEvents";
 interface Message{id:string;role:"user"|"assistant";content:string;timestamp:Date;tokens?:number;streaming?:boolean;error?:boolean;}
 interface AgentChatPageProps{provider:ProviderId;onBack:()=>void;}
 interface ProviderHealth{id:ProviderId;configured?:boolean;reachable?:boolean|null;latency?:number|null;error?:string;bridge?:string;commandLabel?:string;envKey?:string;}
-const ACCENT:Record<ProviderId,string>={claude:"#F72585",openai:"#00A676",gemini:"#5F8C94",hermes:"#6D28D9",antigravity:"#4F46E5"};
-const ACCENT_RGB:Record<ProviderId,string>={claude:"209,132,73",openai:"138,154,85",gemini:"95,140,148",hermes:"226,178,79",antigravity:"79,70,229"};
+const ACCENT:Record<ProviderId,string>={claude:"#F72585",openai:"#00A676",gemini:"#5F8C94",hermes:"#6D28D9"};
+const ACCENT_RGB:Record<ProviderId,string>={claude:"209,132,73",openai:"138,154,85",gemini:"95,140,148",hermes:"226,178,79"};
 const STARTERS:Record<ProviderId,string[]>={
   claude:["Analyze this codebase and suggest improvements","Write a strategic brief for my next quarter","Explain this concept step by step"],
   openai:["Help me brainstorm creative ideas","Draft a professional email","Summarize this in simple terms"],
   gemini:["What's happening in AI today?","Compare these two approaches","Give me a quick research overview"],
   hermes:["Revisa mi Obsidian y dame contexto","Ayúdame a organizar esta idea","Qué tienes en memoria sobre esto?"],
-  antigravity:["Abrir workspace de NEXUS","Planear una tarea de código","Revisar arquitectura del repo"],
 };
-const TAGLINES:Record<ProviderId,string>={claude:"Brilliant reasoning, deep code, nuanced writing",openai:"Versatile intelligence across every domain",gemini:"Multimodal speed — text, images, and beyond",hermes:"Hermi · segundo cerebro · Obsidian · herramientas",antigravity:"Google Antigravity · IDE externo · puente pendiente"};
+const TAGLINES:Record<ProviderId,string>={claude:"Brilliant reasoning, deep code, nuanced writing",openai:"Versatile intelligence across every domain",gemini:"Multimodal speed — text, images, and beyond",hermes:"Hermi · segundo cerebro · Obsidian · herramientas"};
 
 function TypingDots({color}:{color:string}){
   return<div className="flex items-center gap-1">{[0,0.15,0.3].map((d,i)=><motion.div key={i} className="w-2 h-2 rounded-full" style={{background:color}} animate={{y:[0,-5,0],opacity:[0.4,1,0.4]}} transition={{duration:0.7,repeat:Infinity,delay:d,ease:"easeInOut"}}/>)}</div>;
