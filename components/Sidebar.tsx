@@ -6,17 +6,17 @@ import AgentAvatar from "./AgentAvatar";
 import { PROVIDERS } from "@/lib/providers";
 import type { ProviderId } from "@/lib/providers";
 
-const ACCENT: Record<ProviderId,string> = { claude:"#F72585", openai:"#00A676", gemini:"#5F8C94", hermes:"#6D28D9" };
+const ACCENT: Record<ProviderId,string> = { claude:"#F72585", openai:"#00A676", gemini:"#5F8C94", hermes:"#A855F7" };
 
 interface SidebarProps { activeView: string; onViewChange: (v:string)=>void; }
 interface ProviderHealth { id: ProviderId; configured?: boolean; reachable?: boolean; error?: string; }
 
 function NavBtn({id,label,icon:Icon,isActive,onClick}:{id:string;label:string;icon:React.ElementType;isActive:boolean;onClick:()=>void}) {
   return (
-    <motion.button type="button" onClick={onClick} className="relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?"rgba(139,28,246,0.32)":"rgba(255,255,255,0.03)",border:isActive?"1px solid rgba(255,255,255,0.30)":"1px solid rgba(255,255,255,0.08)",cursor:"pointer"}} whileHover={{background:"rgba(255,255,255,0.12)",x:1}} whileTap={{scale:0.98}}>
-      {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full" style={{background:"#C084FC"}} transition={{type:"spring",stiffness:450,damping:35}}/>}
-      <Icon size={19} style={{color:"#FFFFFF",flexShrink:0}}/>
-      <span className="text-[19px] font-black flex-1 leading-tight" style={{fontFamily:"var(--font-outfit)",color:"#FFFFFF",textShadow:"0 2px 12px rgba(0,0,0,0.40)"}}>{label}</span>
+    <motion.button type="button" onClick={onClick} className="relative flex items-center gap-3 w-full px-4 py-3.5 rounded-xl text-left" style={{background:isActive?"rgba(168,85,247,0.42)":"rgba(255,255,255,0.055)",border:isActive?"1px solid rgba(255,255,255,0.38)":"1px solid rgba(255,255,255,0.12)",cursor:"pointer"}} whileHover={{background:"rgba(255,255,255,0.14)",x:1}} whileTap={{scale:0.98}}>
+      {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-full" style={{background:"#E9D5FF"}} transition={{type:"spring",stiffness:450,damping:35}}/>}
+      <Icon size={22} style={{color:"#FFFFFF",flexShrink:0}}/>
+      <span className="text-[21px] font-black flex-1 leading-tight" style={{fontFamily:"var(--font-outfit)",color:"#FFFFFF",textShadow:"0 2px 14px rgba(0,0,0,0.55)"}}>{label}</span>
     </motion.button>
   );
 }
@@ -169,7 +169,7 @@ export default function Sidebar({activeView,onViewChange}:SidebarProps) {
       </AnimatePresence>
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 px-2 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2" style={{background:"linear-gradient(180deg, rgba(247,239,226,0), rgba(247,239,226,0.96) 18%, rgba(52,35,22,0.98))",borderTop:"1px solid rgba(109,40,217,0.10)",backdropFilter:"blur(18px)"}}>
-        <div className="grid grid-cols-5 gap-1 rounded-2xl p-1" style={{background:"rgba(247,239,226,0.78)",border:"1px solid rgba(109,40,217,0.12)"}}>
+        <div className="grid grid-cols-5 gap-1 rounded-2xl p-1" style={{background:"rgba(247,239,226,0.92)",border:"1px solid rgba(76,29,149,0.18)"}}>
           {[
             {id:"dashboard",label:"Inicio",icon:LayoutDashboard},
             {id:"orchestrator",label:"AI",icon:BrainCircuit},
@@ -178,9 +178,9 @@ export default function Sidebar({activeView,onViewChange}:SidebarProps) {
             {id:"audiovisuales",label:"Audiov.",icon:Video},
           ].map(({id,label,icon:Icon})=>{
             const isActive=activeView===id;
-            return <button type="button" key={id} onClick={()=>onViewChange(id)} className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2" style={{background:isActive?"rgba(109,40,217,0.10)":"rgba(109,40,217,0)",border:isActive?"1px solid rgba(109,40,217,0.22)":"1px solid rgba(109,40,217,0)",color:isActive?"#6D28D9":"rgba(7,24,46,0.72)",fontFamily:"var(--font-outfit)"}}>
-              <Icon size={16}/>
-              <span className="text-[10px] font-semibold truncate max-w-full">{label}</span>
+            return <button type="button" key={id} onClick={()=>onViewChange(id)} className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2.5" style={{background:isActive?"rgba(76,29,149,0.14)":"rgba(109,40,217,0)",border:isActive?"1px solid rgba(76,29,149,0.32)":"1px solid rgba(109,40,217,0)",color:isActive?"#4C1D95":"#07182E",fontFamily:"var(--font-outfit)"}}>
+              <Icon size={18}/>
+              <span className="text-[12px] font-black truncate max-w-full">{label}</span>
             </button>;
           })}
         </div>

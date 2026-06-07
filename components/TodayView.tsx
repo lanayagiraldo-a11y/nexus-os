@@ -64,8 +64,8 @@ const fallbackProjectCompany: TodayTask[] = [
 ];
 
 const toneStyles: Record<TodayTask["priority"], { color: string; rgb: string; label: string }> = {
-  high: { color: "#EF4444", rgb: "196,98,58", label: "Alta" },
-  medium: { color: "#6D28D9", rgb: "226,178,79", label: "Media" },
+  high: { color: "#B91C1C", rgb: "185,28,28", label: "Alta" },
+  medium: { color: "#4C1D95", rgb: "76,29,149", label: "Media" }, 
   normal: { color: "#00A676", rgb: "138,154,85", label: "Normal" },
   waiting: { color: "#5F8C94", rgb: "95,140,148", label: "Esperando" },
 };
@@ -80,8 +80,8 @@ function SectionCard({ title, subtitle, icon: Icon, accent, children, defaultOpe
           <Icon size={17} style={{ color: accent }} />
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-black" style={{ fontFamily: "var(--font-syne)", color: accent }}>{title}</h2>
-          <p className="text-[11px] mt-0.5" style={{ fontFamily: "var(--font-outfit)", color: "rgba(7,24,46,0.58)" }}>{subtitle}</p>
+          <h2 className="text-lg sm:text-xl font-black leading-tight" style={{ fontFamily: "var(--font-syne)", color: accent }}>{title}</h2>
+          <p className="text-sm mt-1 leading-snug" style={{ fontFamily: "var(--font-outfit)", color: "rgba(7,24,46,0.76)" }}>{subtitle}</p>
         </div>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }} className="mt-1 rounded-full p-1" style={{ background: `rgba(${rgb},0.08)`, border: `1px solid rgba(${rgb},0.13)` }}>
           <ChevronDown size={15} style={{ color: accent }} />
@@ -102,10 +102,10 @@ function CollapsibleGroup({ title, subtitle, count, children, defaultOpen = fals
           <ChevronDown size={13} style={{ color: accent }} />
         </motion.div>
         <div className="min-w-0 flex-1">
-          <div className="text-[12px] font-black" style={{ fontFamily: "var(--font-syne)", color: "rgba(226,232,240,0.9)" }}>{title}</div>
-          {subtitle && <div className="text-[10px] truncate" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.58)" }}>{subtitle}</div>}
+          <div className="text-base sm:text-[17px] font-black leading-tight" style={{ fontFamily: "var(--font-syne)", color: "#07182E" }}>{title}</div>
+          {subtitle && <div className="text-[13px] truncate mt-0.5" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.70)" }}>{subtitle}</div>}
         </div>
-        <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ fontFamily: "var(--font-jetbrains)", color: accent, background: `rgba(${rgb},0.08)`, border: `1px solid rgba(${rgb},0.14)` }}>{count}</span>
+        <span className="text-[12px] px-2 py-1 rounded-full font-black" style={{ fontFamily: "var(--font-jetbrains)", color: accent, background: `rgba(${rgb},0.10)`, border: `1px solid rgba(${rgb},0.22)` }}>{count}</span>
       </button>
       {open && <motion.div initial={false} animate={{ opacity: 1, height: "auto" }} className="px-2.5 pb-2.5">{children}</motion.div>}
     </div>
@@ -158,11 +158,11 @@ function TaskRow({ item }: { item: TodayTask }) {
         <CheckCircle2 size={11} style={{ color: s.color }} />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[13px] leading-snug" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.88)" }}>{item.title}</div>
+        <div className="text-[15px] sm:text-base leading-snug font-semibold" style={{ fontFamily: "var(--font-outfit)", color: "#111827" }}>{item.title}</div>
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-          {item.inProgress && <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ fontFamily: "var(--font-jetbrains)", color: "#6D28D9", background: "rgba(109,40,217,0.10)", border: "1px solid rgba(109,40,217,0.18)" }}>EN PROCESO</span>}
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ fontFamily: "var(--font-jetbrains)", color: s.color, background: `rgba(${s.rgb},0.08)`, border: `1px solid rgba(${s.rgb},0.16)` }}>{s.label}</span>
-          <span className="text-[10px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.48)" }}>{item.section}</span>
+          {item.inProgress && <span className="text-[11px] px-2 py-0.5 rounded-full font-bold" style={{ fontFamily: "var(--font-jetbrains)", color: "#4C1D95", background: "rgba(76,29,149,0.10)", border: "1px solid rgba(76,29,149,0.20)" }}>EN PROCESO</span>}
+          <span className="text-[11px] px-2 py-0.5 rounded-full font-bold" style={{ fontFamily: "var(--font-jetbrains)", color: s.color, background: `rgba(${s.rgb},0.10)`, border: `1px solid rgba(${s.rgb},0.18)` }}>{s.label}</span>
+          <span className="text-[12px] font-semibold" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.68)" }}>{item.section}</span>
         </div>
       </div>
     </div>
@@ -245,11 +245,11 @@ export default function TodayView() {
         <motion.div initial={false} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={15} style={{ color: "#6D28D9" }} />
-              <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(109,40,217,0.72)" }}>Today Command Deck</span>
+              <Sparkles size={16} style={{ color: "#4C1D95" }} />
+              <span className="text-[12px] font-black tracking-[0.18em] uppercase" style={{ fontFamily: "var(--font-jetbrains)", color: "#4C1D95" }}>Today Command Deck</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight" style={{ fontFamily: "var(--font-syne)", color: "#07182E", letterSpacing: "-0.02em" }}>Hoy, Liliana</h1>
-            <p className="text-[13px] mt-1 capitalize" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.58)" }}>{todayLabel} · conectado a tu Daily Note real</p>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight" style={{ fontFamily: "var(--font-syne)", color: "#07182E", letterSpacing: "-0.02em" }}>Hoy, Liliana</h1>
+            <p className="text-base mt-1 capitalize" style={{ fontFamily: "var(--font-outfit)", color: "rgba(31,41,55,0.74)" }}>{todayLabel} · conectado a tu Daily Note real</p>
             {dailyFile && <p className="text-[10px] mt-1 truncate max-w-[720px]" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(31,41,55,0.36)" }}>{dailyFile}</p>}
           </div>
           <div className="grid grid-cols-3 gap-2 min-w-[260px]">
@@ -274,7 +274,7 @@ export default function TodayView() {
           <SectionCard title="Empresas y proyectos urgentes" subtitle="Pendientes abiertos de todos los frentes, no solo La Carolina" icon={BriefcaseBusiness} accent="#EF4444">
             <div className="mb-3 rounded-xl p-3" style={{ background: "rgba(239,68,68,0.055)", border: "1px solid rgba(239,68,68,0.12)" }}>
               <div className="text-[10px] uppercase tracking-widest mb-1" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(239,68,68,0.78)" }}>Lectura estratégica</div>
-              <p className="text-[12px] leading-relaxed" style={{ fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.72)" }}>
+              <p className="text-[15px] leading-relaxed font-medium" style={{ fontFamily: "var(--font-outfit)", color: "#111827" }}>
                 Esta vista mezcla La Carolina con Buzzi, IERA, Dar Ibrahim, Fondo El Salvador, Marca Isa, patrimonio y otros proyectos para que veas qué pendiente desbloquea deuda, ingresos, permisos, entregas o decisiones.
               </p>
             </div>
@@ -284,13 +284,13 @@ export default function TodayView() {
           <SectionCard title="Estado transversal" subtitle="En proceso y cerrados recientes de todos los frentes" icon={CheckCircle2} accent="#00A676">
             {summary.projectCompanyInProgress.length > 0 && (
               <div className="mb-3">
-                <div className="text-[10px] uppercase tracking-widest mb-2" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(109,40,217,0.75)" }}>En proceso</div>
+                <div className="text-[12px] uppercase tracking-widest mb-2 font-black" style={{ fontFamily: "var(--font-jetbrains)", color: "#4C1D95" }}>En proceso</div>
                 {summary.projectCompanyInProgress.map((item: TodayTask) => <TaskRow key={`progress-${item.id}`} item={item} />)}
               </div>
             )}
             {summary.projectCompanyDone.length > 0 ? (
               <div>
-                <div className="text-[10px] uppercase tracking-widest mb-2" style={{ fontFamily: "var(--font-jetbrains)", color: "rgba(0,166,118,0.75)" }}>Cerrados hoy / recientes</div>
+                <div className="text-[12px] uppercase tracking-widest mb-2 font-black" style={{ fontFamily: "var(--font-jetbrains)", color: "#047857" }}>Cerrados hoy / recientes</div>
                 {summary.projectCompanyDone.map((item: TodayTask) => <TaskRow key={`done-${item.id}`} item={item} />)}
               </div>
             ) : <EmptyState text="Cuando marques tareas de cualquier empresa o proyecto como hechas, aparecerán aquí para que veas avance transversal." />}
@@ -303,20 +303,20 @@ export default function TodayView() {
           <SectionCard title="Captura rápida" subtitle="Dicta o escribe en bruto; se guarda en la Daily Note" icon={PenLine} accent="#F72585">
             <textarea value={capture} onChange={e => setCapture(e.target.value)} placeholder="Ej: Hoy necesito enfocarme en La Carolina, Dar Ibrahim, Buzzi y Fondo El Salvador..." className="w-full min-h-[118px] resize-none rounded-xl p-3 text-sm focus:outline-none" style={{ fontFamily: "var(--font-outfit)", color: "#07182E", background: "rgba(7,24,46,0.035)", border: "1px solid rgba(247,37,133,0.14)" }} />
             <div className="flex items-center justify-between mt-3 gap-2">
-              <button onClick={startVoice} disabled={!isSupported || voiceState === "listening"} className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ cursor: isSupported ? "pointer" : "not-allowed", background: voiceState === "listening" ? "rgba(239,68,68,0.12)" : "rgba(7,24,46,0.04)", border: "1px solid rgba(7,24,46,0.08)", color: voiceState === "listening" ? "#EF4444" : "rgba(226,232,240,0.7)" }}>
-                <Mic size={14} />
-                <span className="text-[11px]" style={{ fontFamily: "var(--font-outfit)" }}>{voiceState === "listening" ? "Escuchando…" : "Dictar"}</span>
+              <button onClick={startVoice} disabled={!isSupported || voiceState === "listening"} className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ cursor: isSupported ? "pointer" : "not-allowed", background: voiceState === "listening" ? "rgba(239,68,68,0.12)" : "rgba(7,24,46,0.04)", border: "1px solid rgba(7,24,46,0.08)", color: voiceState === "listening" ? "#B91C1C" : "#111827" }}>
+                <Mic size={15} />
+                <span className="text-[13px] font-bold" style={{ fontFamily: "var(--font-outfit)" }}>{voiceState === "listening" ? "Escuchando…" : "Dictar"}</span>
               </button>
               <button onClick={saveCapture} disabled={saving || !capture.trim()} className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ cursor: capture.trim() ? "pointer" : "not-allowed", background: "rgba(247,37,133,0.12)", border: "1px solid rgba(247,37,133,0.24)", color: "#F72585" }}>
-                <Send size={13} />
-                <span className="text-[11px] font-bold" style={{ fontFamily: "var(--font-syne)" }}>{saving ? "Guardando…" : saved ? "Guardado" : "Guardar"}</span>
+                <Send size={15} />
+                <span className="text-[13px] font-black" style={{ fontFamily: "var(--font-syne)" }}>{saving ? "Guardando…" : saved ? "Guardado" : "Guardar"}</span>
               </button>
             </div>
           </SectionCard>
         </div>
 
-        <SectionCard title="Daily Note" subtitle="Vista previa viva desde Obsidian" icon={ClipboardList} accent="#6D28D9">
-          <div className="rounded-xl p-4 max-h-72 overflow-y-auto whitespace-pre-wrap" style={{ background: "rgba(247,239,226,0.38)", border: "1px solid rgba(109,40,217,0.12)", fontFamily: "var(--font-outfit)", color: "rgba(226,232,240,0.76)", fontSize: 12, lineHeight: 1.7 }}>
+        <SectionCard title="Daily Note" subtitle="Vista previa viva desde Obsidian" icon={ClipboardList} accent="#4C1D95">
+        <div className="rounded-xl p-4 max-h-72 overflow-y-auto whitespace-pre-wrap" style={{ background: "rgba(255,255,255,0.62)", border: "1px solid rgba(76,29,149,0.18)", fontFamily: "var(--font-outfit)", color: "#111827", fontSize: 15, lineHeight: 1.75 }}>
             {dailyContent || "Aún no hay contenido cargado para la Daily Note de hoy. Usa Captura rápida para empezar."}
           </div>
         </SectionCard>
