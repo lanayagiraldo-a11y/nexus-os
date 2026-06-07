@@ -26,7 +26,7 @@ export async function GET() {
   const hermesBaseUrl = getHermesBaseUrl().replace(/\/$/, "");
   const results: ProviderHealth[] = await Promise.all([
     (async (): Promise<ProviderHealth> => {
-      const key = process.env.CLAUDE_API_KEY;
+      const key = process.env.CLAUDE_API_KEY ?? process.env.ANTHROPIC_API_KEY;
       if (!key) return { id: "claude", configured: false, reachable: null, latency: null };
       const { ok, latency, error } = await pingUrl("https://api.anthropic.com/v1/models", {
         "x-api-key": key,

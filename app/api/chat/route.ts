@@ -12,10 +12,23 @@ interface ChatMessage {
 }
 
 function sseStream(fn: (controller: ReadableStreamDefaultController) => Promise<void>): Response {
+  const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      await fn(controller);
-      controller.close();
+      const heartbeat = setInterval(() => {
+        try {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ heartbeat: true })}\n\n`));
+        } catch {
+          clearInterval(heartbeat);
+        }
+      }, 10_000);
+      try {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ status: "connecting" })}\n\n`));
+        await fn(controller);
+      } finally {
+        clearInterval(heartbeat);
+        controller.close();
+      }
     },
   });
   return new Response(stream, {
@@ -29,7 +42,7 @@ function send(controller: ReadableStreamDefaultController, data: object) {
 }
 
 async function streamClaude(messages: ChatMessage[]): Promise<Response> {
-  const key = process.env.CLAUDE_API_KEY;
+  const key = process.env.CLAUDE_API_KEY ?? process.env.ANTHROPIC_API_KEY;
   if (!key) return Response.json({ error: "CLAUDE_API_KEY not set" }, { status: 401 });
   const client = new Anthropic({ apiKey: key });
   return sseStream(async (ctrl) => {
@@ -46,7 +59,9 @@ async function streamClaude(messages: ChatMessage[]): Promise<Response> {
       const final = await s.finalMessage();
       send(ctrl, { done: true, usage: { input: final.usage.input_tokens, output: final.usage.output_tokens } });
     } catch (error) {
-      send(ctrl, { error: String(error) });
+      const message = String(error);
+      if (message.includes("401 status code")) send(ctrl, { error: "Claude no pudo autenticarse con la llave de producción. Actualiza CLAUDE_API_KEY/ANTHROPIC_API_KEY en Netlify." });
+      else send(ctrl, { error: message });
     }
   });
 }
@@ -79,7 +94,7 @@ async function streamGemini(messages: ChatMessage[]): Promise<Response> {
   if (!process.env.GEMINI_API_KEY) return Response.json({ error: "GEMINI_API_KEY not set" }, { status: 401 });
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   const requestedModel = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
-  const modelNames = Array.from(new Set([requestedModel, "gemini-2.0-flash", "gemini-1.5-flash"]));
+  const modelNames = [requestedModel];
   return sseStream(async (ctrl) => {
     const history = messages.slice(0, -1).map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
     const prompt = messages[messages.length - 1]?.content ?? "";

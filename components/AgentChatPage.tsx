@@ -21,6 +21,16 @@ const STARTERS:Record<ProviderId,string[]>={
 };
 const TAGLINES:Record<ProviderId,string>={claude:"Brilliant reasoning, deep code, nuanced writing",openai:"Versatile intelligence across every domain",gemini:"Multimodal speed — text, images, and beyond",hermes:"Hermi · segundo cerebro · Obsidian · herramientas"};
 
+function cleanError(raw:string){
+  const text=raw.replace(/^Error:\s*/i,"");
+  if(/401 status code|unauthorized|invalid.*api/i.test(text))return"La llave/API de este agente no está autorizando la respuesta. Revisa la variable de entorno de producción.";
+  if(/429|quota|rate[- ]?limit|Too Many Requests/i.test(text))return"Gemini llegó al límite de cuota por ahora. Intenta de nuevo más tarde o usa Hermi/ChatGPT mientras se libera la cuota.";
+  if(/not found|not supported|models\//i.test(text))return"El modelo configurado no está disponible para esta llave. Hay que cambiar el modelo en la configuración.";
+  if(/Hermes Agent.*(401|403)|HERMES_API_KEY/i.test(text))return"Hermi no pudo autenticarse con Hermes. Hay que actualizar HERMES_API_KEY en producción.";
+  if(/fetch failed|Request failed|Connection lost|network/i.test(text))return"Falló la conexión con el agente. Intenta otra vez; si sigue, hay que renovar el túnel/API.";
+  return text.length>420?`${text.slice(0,420)}…`:text;
+}
+
 function TypingDots({color}:{color:string}){
   return<div className="flex items-center gap-1">{[0,0.15,0.3].map((d,i)=><motion.div key={i} className="w-2 h-2 rounded-full" style={{background:color}} animate={{y:[0,-5,0],opacity:[0.4,1,0.4]}} transition={{duration:0.7,repeat:Infinity,delay:d,ease:"easeInOut"}}/>)}</div>;
 }
@@ -36,7 +46,7 @@ function Bubble({msg,isFirstOfGroup,isLastOfGroup,provId,accent,accentRgb}:{msg:
       <div className={`flex flex-col max-w-[72%] ${isUser?"items-end":"items-start"}`}>
         {isFirstOfGroup&&!isUser&&<span className="text-[11px] font-semibold mb-1 ml-1" style={{fontFamily:"var(--font-jetbrains)",color:`rgba(${accentRgb},0.7)`}}>{PROVIDERS.find(p=>p.id===provId)?.name}</span>}
         <div className="relative group">
-          <div className="px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap" style={{fontFamily:"var(--font-outfit)",color:msg.error?"#EF4444":isUser?"rgba(226,232,240,0.95)":"rgba(226,232,240,0.88)",background:isUser?`linear-gradient(135deg,rgba(${accentRgb},0.22),rgba(${accentRgb},0.14))`:"rgba(13,20,40,0.9)",border:isUser?`1px solid rgba(${accentRgb},0.3)`:"1px solid rgba(7,24,46,0.07)",borderRadius:isUser?"14px 4px 14px 14px":"4px 14px 14px 14px",backdropFilter:"blur(12px)",maxWidth:"100%"}}>
+          <div className="px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap" style={{fontFamily:"var(--font-outfit)",color:msg.error?"#FFFFFF":isUser?"#0F172A":"#FFFFFF",background:msg.error?"linear-gradient(135deg,#B91C1C,#7F1D1D)":isUser?`linear-gradient(135deg,rgba(${accentRgb},0.18),rgba(255,255,255,0.88))`:"rgba(15,23,42,0.92)",border:msg.error?"1px solid rgba(255,255,255,0.28)":isUser?`1px solid rgba(${accentRgb},0.3)`:"1px solid rgba(255,255,255,0.10)",borderRadius:isUser?"14px 4px 14px 14px":"4px 14px 14px 14px",backdropFilter:"blur(12px)",maxWidth:"100%"}}>
             {msg.streaming&&!msg.content?<TypingDots color={accent}/>:<>{msg.content}{msg.streaming&&<motion.span animate={{opacity:[1,0]}} transition={{duration:0.45,repeat:Infinity}} style={{color:accent,marginLeft:2}}>▊</motion.span>}</>}
           </div>
           {!isUser&&!msg.streaming&&msg.content&&<motion.button initial={{opacity:0}} whileHover={{opacity:1}} className="absolute -right-8 top-1/2 -translate-y-1/2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100" style={{background:"rgba(13,20,40,0.8)",border:"1px solid rgba(7,24,46,0.08)",cursor:"pointer"}} onClick={copy}>{copied?<Check size={11} style={{color:"#00A676"}}/>:<Copy size={11} style={{color:"rgba(31,41,55,0.5)"}}/>}</motion.button>}
@@ -94,12 +104,12 @@ export default function AgentChatPage({provider:provId,onBack}:AgentChatPageProp
     abortRef.current=new AbortController();
     try{
       const resp=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({provider:provId,messages:[...history,{role:"user",content:text}]}),signal:abortRef.current.signal});
-      if(!resp.ok){const err=await resp.json().catch(()=>({error:"Request failed"}));setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:`Error: ${err.error??"Unknown"}`,streaming:false,error:true}:m));emitNexusEvent({type:"warning",agent:prov.name.toUpperCase(),message:"Request failed",detail:err.error??"Unknown error"});setStreaming(false);return;}
+      if(!resp.ok){const err=await resp.json().catch(()=>({error:"Request failed"}));const friendly=cleanError(err.error??"Unknown");setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:`Error: ${friendly}`,streaming:false,error:true}:m));emitNexusEvent({type:"warning",agent:prov.name.toUpperCase(),message:"Request failed",detail:friendly});setStreaming(false);return;}
       const reader=resp.body!.getReader();const dec=new TextDecoder();let acc="";let outTok=0;
       while(true){const{done,value}=await reader.read();if(done)break;
         for(const line of dec.decode(value).split("\n")){
           if(!line.startsWith("data: "))continue;
-          try{const d=JSON.parse(line.slice(6));if(d.text){acc+=d.text;setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:acc}:m));}if(d.done)outTok=d.usage?.output??d.usage?.total??0;if(d.error){acc=`Error: ${d.error}`;setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:acc,streaming:false,error:true}:m));}}catch{}
+          try{const d=JSON.parse(line.slice(6));if(d.text){acc+=d.text;setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:acc}:m));}if(d.done)outTok=d.usage?.output??d.usage?.total??0;if(d.error){acc=`Error: ${cleanError(d.error)}`;setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:acc,streaming:false,error:true}:m));}}catch{}
         }
       }
       setMessages(prev=>prev.map(m=>m.id===streamId?{...m,streaming:false,tokens:outTok||undefined}:m));
@@ -126,7 +136,7 @@ export default function AgentChatPage({provider:provId,onBack}:AgentChatPageProp
           }),
         }).catch(()=>{}); // silent — vault path may not be set yet
       }
-    }catch(e){if((e as Error).name!=="AbortError")setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:"Connection lost. Check .env.local API keys.",streaming:false,error:true}:m));}
+    }catch(e){if((e as Error).name!=="AbortError")setMessages(prev=>prev.map(m=>m.id===streamId?{...m,content:`Error: ${cleanError(String(e))}`,streaming:false,error:true}:m));}
     setStreaming(false);
   },[input,streaming,provId,messages]);
 
@@ -163,12 +173,12 @@ export default function AgentChatPage({provider:provId,onBack}:AgentChatPageProp
                 <span className="text-[10px] uppercase tracking-[0.18em]" style={{fontFamily:"var(--font-jetbrains)",color:`rgba(${accentRgb},0.7)`}}>Comando real</span>
                 <span className="flex items-center gap-1.5 text-[10px]" style={{fontFamily:"var(--font-jetbrains)",color:statusColor}}><span className="h-1.5 w-1.5 rounded-full" style={{background:statusColor}}/>{statusText}</span>
               </div>
-              <div className="text-[11px] mb-1" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(226,232,240,0.72)"}}>{commandLabel}</div>
+              <div className="text-[11px] mb-1" style={{fontFamily:"var(--font-jetbrains)",color:"#111827"}}>{commandLabel}</div>
               <div className="text-[10px]" style={{fontFamily:"var(--font-outfit)",color:"rgba(31,41,55,0.55)"}}>Bridge: {bridgeLabel} · Config: {health?.envKey??prov.envKey}{health?.latency?` · ${health.latency}ms`:""}</div>
               {health?.error&&<div className="text-[10px] mt-1 truncate" style={{fontFamily:"var(--font-outfit)",color:"#EF4444"}}>Error: {health.error}</div>}
             </div>
             <div className="grid grid-cols-3 gap-3 max-w-md w-full">
-              {STARTERS[provId].map((s,i)=><motion.button key={i} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.1+i*0.08}} onClick={()=>{setInput(s);setTimeout(()=>textareaRef.current?.focus(),50);}} className="px-3 py-2 rounded-xl text-left text-[11px] leading-snug" style={{background:`rgba(${accentRgb},0.07)`,border:`1px solid rgba(${accentRgb},0.18)`,color:"rgba(226,232,240,0.65)",fontFamily:"var(--font-outfit)",cursor:"pointer"}} whileHover={{background:`rgba(${accentRgb},0.12)`}}>{s}</motion.button>)}
+              {STARTERS[provId].map((s,i)=><motion.button key={i} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.1+i*0.08}} onClick={()=>{setInput(s);setTimeout(()=>textareaRef.current?.focus(),50);}} className="px-3 py-2 rounded-xl text-left text-[11px] leading-snug font-semibold" style={{background:`rgba(${accentRgb},0.09)`,border:`1px solid rgba(${accentRgb},0.2)`,color:"#111827",fontFamily:"var(--font-outfit)",cursor:"pointer"}} whileHover={{background:`rgba(${accentRgb},0.14)`}}>{s}</motion.button>)}
             </div>
           </motion.div>
         )}
@@ -179,13 +189,13 @@ export default function AgentChatPage({provider:provId,onBack}:AgentChatPageProp
       {/* Input */}
       <div className="px-5 py-4 flex-shrink-0" style={{borderTop:`1px solid rgba(${accentRgb},0.1)`}}>
         {interimText&&<div className="mb-2 px-4 py-2 rounded-xl text-[13px] italic" style={{fontFamily:"var(--font-outfit)",color:`rgba(${accentRgb},0.6)`,background:`rgba(${accentRgb},0.05)`,border:`1px solid rgba(${accentRgb},0.1)`}}>🎤 {interimText}</div>}
-        <div className="flex items-end gap-3 rounded-2xl px-4 py-3" style={{background:"rgba(13,20,40,0.9)",border:`1px solid rgba(${accentRgb},0.2)`}}>
-          <textarea ref={textareaRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={handleKey} placeholder={isListening?`Listening… speak now`:`Message ${prov.name}…`} rows={1} className="flex-1 bg-transparent resize-none focus:outline-none text-sm leading-relaxed" style={{fontFamily:"var(--font-outfit)",color:"#07182E",maxHeight:160,overflow:"auto"}}/>
+        <div className="flex items-end gap-3 rounded-2xl px-4 py-3 shadow-sm" style={{background:"rgba(255,255,255,0.94)",border:`2px solid rgba(${accentRgb},0.34)`,boxShadow:`0 10px 28px rgba(${accentRgb},0.12)`}}>
+          <textarea ref={textareaRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={handleKey} placeholder={isListening?`Listening… speak now`:`Message ${prov.name}…`} rows={1} className="flex-1 bg-transparent resize-none focus:outline-none text-[16px] leading-relaxed placeholder:text-slate-500" style={{fontFamily:"var(--font-outfit)",color:"#07182E",maxHeight:160,overflow:"auto",fontWeight:600}}/>
           {/* Mic button */}
           {voiceSupported&&(
             <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} onClick={startVoice} className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center relative" style={{background:isListening?`rgba(${accentRgb},0.2)`:"rgba(7,24,46,0.06)",border:isListening?`1px solid rgba(${accentRgb},0.5)`:"1px solid rgba(7,24,46,0.1)",cursor:"pointer"}}>
               {isListening&&<motion.div className="absolute inset-0 rounded-xl" style={{border:`2px solid rgba(${accentRgb},0.6)`}} animate={{scale:[1,1.2,1],opacity:[0.8,0,0.8]}} transition={{duration:1.2,repeat:Infinity}}/>}
-              {isListening?<Mic size={15} style={{color:accent,position:"relative",zIndex:1}}/>:<MicOff size={15} style={{color:"rgba(31,41,55,0.4)",position:"relative",zIndex:1}}/>}
+              {isListening?<Mic size={15} style={{color:accent,position:"relative",zIndex:1}}/>:<MicOff size={15} style={{color:"#334155",position:"relative",zIndex:1}}/>}
             </motion.button>
           )}
           {/* Send / Stop */}
@@ -193,7 +203,7 @@ export default function AgentChatPage({provider:provId,onBack}:AgentChatPageProp
             {streaming?(
               <motion.button key="stop" initial={{scale:0.8,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.8,opacity:0}} whileHover={{scale:1.08}} whileTap={{scale:0.92}} onClick={()=>{abortRef.current?.abort();setStreaming(false);}} className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.3)",cursor:"pointer"}}><div className="w-3 h-3 rounded-sm" style={{background:"#EF4444"}}/></motion.button>
             ):(
-              <motion.button key="send" initial={{scale:0.8,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.8,opacity:0}} whileHover={input.trim()?{scale:1.08}:undefined} whileTap={input.trim()?{scale:0.92}:undefined} onClick={send} disabled={!input.trim()} className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:input.trim()?accent:"rgba(7,24,46,0.06)",border:"none",cursor:input.trim()?"pointer":"default",transition:"background 0.2s ease"}}><Send size={15} style={{color:input.trim()?"#F7EFE2":`rgba(${accentRgb},0.3)`,transform:"rotate(-10deg)"}}/></motion.button>
+              <motion.button key="send" initial={{scale:0.8,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.8,opacity:0}} whileHover={input.trim()?{scale:1.08}:undefined} whileTap={input.trim()?{scale:0.92}:undefined} onClick={send} disabled={!input.trim()} className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:input.trim()?accent:"rgba(15,23,42,0.08)",border:input.trim()?"none":"1px solid rgba(15,23,42,0.12)",cursor:input.trim()?"pointer":"default",transition:"background 0.2s ease"}}><Send size={15} style={{color:input.trim()?"#FFFFFF":"#475569",transform:"rotate(-10deg)"}}/></motion.button>
             )}
           </AnimatePresence>
         </div>
