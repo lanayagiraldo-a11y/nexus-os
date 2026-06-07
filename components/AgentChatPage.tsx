@@ -145,8 +145,9 @@ export default function AgentChatPage({provider:provId,onBack}:AgentChatPageProp
   const isListening=voiceState==="listening";
   const isOnline=health?.reachable===true;
   const isConfigured=health?.configured!==false;
-  const statusText=streaming?"Generating…":isOnline?"Online":isConfigured?"Standby":"Setup";
-  const statusColor=isOnline?"#00A676":isConfigured?"#6D28D9":"#EF4444";
+  const hasHealthError=health?.reachable===false||Boolean(health?.error);
+  const statusText=streaming?"Generating…":isOnline?"Online":hasHealthError?"Revisar llave":isConfigured?"Checking":"Setup";
+  const statusColor=isOnline?"#00A676":hasHealthError?"#EF4444":isConfigured?"#6D28D9":"#EF4444";
   const commandLabel=health?.commandLabel??prov.commandLabel;
   const bridgeLabel=health?.bridge??prov.bridge;
 

@@ -22,16 +22,49 @@ async function pingUrl(url: string, headers: Record<string, string> = {}): Promi
   }
 }
 
+async function pingClaude(key: string): Promise<{ ok: boolean; latency: number; error?: string }> {
+  const start = Date.now();
+  if (!key.startsWith("sk-ant-")) {
+    return { ok: false, latency: 0, error: "CLAUDE_API_KEY no tiene formato de llave Anthropic (sk-ant-...)" };
+  }
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: process.env.CLAUDE_MODEL ?? "claude-sonnet-4-6",
+        max_tokens: 1,
+        messages: [{ role: "user", content: "OK" }],
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const latency = Date.now() - start;
+    if (resp.ok) return { ok: true, latency };
+
+    const body = await resp.text();
+    const clean = body.includes("authentication_error")
+      ? "Claude no pudo autenticarse con la llave de producción"
+      : body.includes("not_found_error") || body.includes("model")
+        ? "El modelo Claude configurado no está disponible para esta llave"
+        : `HTTP ${resp.status}`;
+    return { ok: false, latency, error: clean };
+  } catch (error) {
+    return { ok: false, latency: Date.now() - start, error: String(error) };
+  }
+}
+
 export async function GET() {
   const hermesBaseUrl = getHermesBaseUrl().replace(/\/$/, "");
   const results: ProviderHealth[] = await Promise.all([
     (async (): Promise<ProviderHealth> => {
       const key = process.env.CLAUDE_API_KEY ?? process.env.ANTHROPIC_API_KEY;
       if (!key) return { id: "claude", configured: false, reachable: null, latency: null };
-      const { ok, latency, error } = await pingUrl("https://api.anthropic.com/v1/models", {
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-      });
+      const { ok, latency, error } = await pingClaude(key);
       return { id: "claude", configured: true, reachable: ok, latency, error };
     })(),
     (async (): Promise<ProviderHealth> => {

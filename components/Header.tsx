@@ -13,11 +13,19 @@ function Metric({ label, value, color }: { label:string; value:number; color:str
     </div>
   );
 }
+interface ProviderHealth{id:string;configured:boolean;reachable:boolean|null;error?:string;}
+
 export default function Header({ onOpenCommand }: { onOpenCommand:()=>void }) {
   const [time,setTime]=useState(""); const [date,setDate]=useState("");
   const [metrics,setMetrics]=useState({cpu:34,mem:67,neural:48});
+  const [claudeHealth,setClaudeHealth]=useState<ProviderHealth|null>(null);
   useEffect(()=>{const tick=()=>{const n=new Date();setTime(n.toLocaleTimeString("en-US",{hour12:false}));setDate(n.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}))};tick();const id=setInterval(tick,1000);return()=>clearInterval(id);},[]);
   useEffect(()=>{const id=setInterval(()=>setMetrics({cpu:Math.floor(Math.random()*40+20),mem:Math.floor(Math.random()*30+50),neural:Math.floor(Math.random()*60+30)}),3000);return()=>clearInterval(id);},[]);
+  useEffect(()=>{let cancelled=false;const load=async()=>{try{const r=await fetch("/api/providers",{cache:"no-store"});const d=await r.json() as {providers?:ProviderHealth[]};if(!cancelled)setClaudeHealth((d.providers??[]).find(p=>p.id==="claude")??null);}catch{if(!cancelled)setClaudeHealth(null);}};load();const id=setInterval(load,30000);return()=>{cancelled=true;clearInterval(id);};},[]);
+  const claudeOk=claudeHealth?.reachable===true;
+  const claudeNeedsKey=claudeHealth?.configured===false;
+  const claudeLabel=claudeOk?"Claude":claudeNeedsKey?"Claude Key":"Claude Auth";
+  const claudeColor=claudeOk?"#00A676":"#EF4444";
   return (
     <motion.header initial={false} animate={{y:0,opacity:1}} transition={{duration:0.6,ease:[0.22,1,0.36,1]}} className="relative z-20 flex items-center justify-between gap-3 px-3 sm:px-4 lg:px-6 h-14 glass" style={{borderTop:"none",borderLeft:"none",borderRight:"none"}}>
       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -47,7 +55,7 @@ export default function Header({ onOpenCommand }: { onOpenCommand:()=>void }) {
       </div>
       <div className="flex items-center gap-2 sm:gap-4">
         <div className="hidden lg:flex items-center gap-3">
-          <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full dot-active"/><span className="text-[10px]" style={{fontFamily:"var(--font-jetbrains)",color:"#00A676"}}>Claude</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full" style={{background:claudeColor}}/><span className="text-[10px]" style={{fontFamily:"var(--font-jetbrains)",color:claudeColor}}>{claudeLabel}</span></div>
           <div className="flex items-center gap-1.5"><Shield size={11} style={{color:"#6D28D9"}}/><span className="text-[10px]" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(109,40,217,0.8)"}}>Secure</span></div>
           <div className="flex items-center gap-1.5"><Wifi size={11} style={{color:"#00A676"}}/><span className="text-[10px]" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(0,166,118,0.8)"}}>Online</span></div>
         </div>
