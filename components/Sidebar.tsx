@@ -67,8 +67,9 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
                 const status = health[p.id];
                 const online = status?.reachable === true;
                 const configured = status?.configured !== false;
-                const statusLabel = online ? "Online" : configured ? "Standby" : "Setup";
-                const statusColor = online ? "#00A676" : configured ? "#6D28D9" : "#EF4444";
+                const hasError = configured && status?.reachable === false;
+                const statusLabel = online ? "Online" : hasError ? "Error" : configured ? "Standby" : "Setup";
+                const statusColor = online ? "#00A676" : hasError ? "#EF4444" : configured ? "#E2B24F" : "#EF4444";
                 return (
                   <motion.button type="button" key={p.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.03+i*0.04}} onClick={()=>onNavigate(viewId)} className="group relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?`linear-gradient(90deg, rgba(${p.accentRgb},0.36), rgba(${p.accentRgb},0.14))`:"rgba(255,255,255,0.05)",border:isActive?`1px solid rgba(255,255,255,0.30)`:"1px solid rgba(255,255,255,0.10)",boxShadow:isActive?`0 0 18px rgba(${p.accentRgb},0.20)`:"none",cursor:"pointer"}} whileHover={{background:`rgba(${p.accentRgb},0.18)`,x:1}} whileTap={{scale:0.98}}>
                     {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full" style={{background:color}} transition={{type:"spring",stiffness:450,damping:35}}/>}
