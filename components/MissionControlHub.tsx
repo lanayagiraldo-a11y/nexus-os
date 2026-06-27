@@ -9,7 +9,7 @@ const PARCHMENT = "#F7EFE2";
 const INK = "#07182E";
 const EMERALD = "#047857";
 
-type TabId = "chat" | "consejo" | "workflow";
+type TabId = "chat" | "workflow";
 
 interface Message {
   id: number;
@@ -48,12 +48,6 @@ export default function MissionControlHub() {
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [agentCounts] = useState({ active: 4, total: 7 });
-
-  // Consejo state
-  const [consejoMission, setConsejoMission] = useState("Evaluar propuesta de Portal de Soledad: análisis financiero, riesgos operativos y campaña de lanzamiento");
-  const [selectedAgents, setSelectedAgents] = useState(["Hermes", "Claude", "Gemini", "ChatGPT"]);
-  const [selectedContext, setSelectedContext] = useState("La Carolina");
-  const [consejoSent, setConsejoSent] = useState(false);
 
   // Workflow state
   const workflows = [
@@ -175,12 +169,6 @@ export default function MissionControlHub() {
     }
   };
 
-  const toggleAgent = (agent: string) => {
-    setSelectedAgents(prev =>
-      prev.includes(agent) ? prev.filter(a => a !== agent) : [...prev, agent]
-    );
-  };
-
   const statusColor = (status: string) => {
     switch(status) {
       case "Libre": case "Listo": return "#047857";
@@ -215,7 +203,6 @@ export default function MissionControlHub() {
       <div className="flex gap-1 px-5 pt-3 flex-shrink-0 border-b" style={{ borderColor: "rgba(76,29,149,0.06)" }}>
         {[
           { id: "chat" as TabId, label: "💬 Chat", count: messages.filter(m => m.role === "agent").length },
-          { id: "consejo" as TabId, label: "🧠 Consejo" },
           { id: "workflow" as TabId, label: "🔀 Workflow", count: workflows.length },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
@@ -314,93 +301,6 @@ export default function MissionControlHub() {
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-lg cursor-pointer border-none flex-shrink-0"
                   style={{ background: PURPLE, color: PARCHMENT }}>➤</button>
               </div>
-            </motion.div>
-          )}
-
-          {activeTab === "consejo" && (
-            <motion.div key="consejo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-y-auto p-4">
-              <div className="text-xs mb-3 leading-relaxed" style={{ color: "rgba(31,41,55,0.45)" }}>
-                El Consejo convoca a varios agentes para una misma tarea. Útil para análisis complejos que necesitan múltiples perspectivas.
-              </div>
-
-              <textarea value={consejoMission} onChange={e => setConsejoMission(e.target.value)}
-                rows={4} className="w-full rounded-xl p-3 text-sm resize-none outline-none"
-                style={{ background: "rgba(247,239,226,0.9)", border: "1px solid rgba(76,29,149,0.1)", color: INK, fontFamily: "'Outfit', sans-serif" }}
-                placeholder="Describe la misión para el consejo…" />
-
-              <div className="flex gap-3 mt-3 flex-wrap">
-                <div className="flex-1 min-w-[200px]">
-                  <div className="text-xs font-bold mb-1.5" style={{ color: PURPLE, fontFamily: "'Syne', sans-serif" }}>🤖 Agentes</div>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {["Hermes", "Claude", "Gemini", "ChatGPT", "Manus"].map(a => (
-                      <button key={a} onClick={() => toggleAgent(a)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer border"
-                        style={{
-                          background: selectedAgents.includes(a) ? "rgba(76,29,149,0.08)" : "rgba(7,24,46,0.02)",
-                          borderColor: selectedAgents.includes(a) ? "rgba(76,29,149,0.22)" : "rgba(7,24,46,0.06)",
-                          color: selectedAgents.includes(a) ? PURPLE : "rgba(31,41,55,0.5)",
-                          fontWeight: selectedAgents.includes(a) ? 600 : 400,
-                        }}>{a}</button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-[200px]">
-                  <div className="text-xs font-bold mb-1.5" style={{ color: PURPLE, fontFamily: "'Syne', sans-serif" }}>📂 Contexto</div>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {["Sin contexto", "La Carolina", "Dar Ibrahim", "Fondo SV", "Pegar texto"].map(c => (
-                      <button key={c} onClick={() => setSelectedContext(c)}
-                        className="px-3 py-1.5 rounded-lg text-xs cursor-pointer border"
-                        style={{
-                          background: selectedContext === c ? "rgba(76,29,149,0.08)" : "rgba(7,24,46,0.02)",
-                          borderColor: selectedContext === c ? "rgba(76,29,149,0.22)" : "rgba(7,24,46,0.06)",
-                          color: selectedContext === c ? PURPLE : "rgba(31,41,55,0.5)",
-                          fontWeight: selectedContext === c ? 600 : 400,
-                        }}>{c}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 mt-3">
-                <button className="px-4 py-2 rounded-lg text-xs font-bold cursor-pointer border" style={{ border: "1px solid rgba(76,29,149,0.1)", color: "rgba(31,41,55,0.4)", background: "transparent" }}>Cancelar</button>
-                <button onClick={() => setConsejoSent(true)} className="px-5 py-2 rounded-lg text-xs font-bold cursor-pointer border-none" style={{ background: PURPLE, color: PARCHMENT, fontFamily: "'Syne', sans-serif" }}>✈️ Enviar al Consejo ({selectedAgents.length})</button>
-              </div>
-
-              {consejoSent && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 space-y-3">
-                  {[
-                    { name: "Claude", role: "Análisis financiero", content: "CAPEX estimado COP $280M. Retorno a 14 meses con TIR del 18%. Apalancamiento: 60% crédito flota nueva.", color: "#7C3AED" },
-                    { name: "Gemini", role: "Demanda y mercado", content: "Demanda validada: 2,340 viajes/día en Portal de Soledad. Crecimiento del 14% vs 2025.", color: "#2563EB" },
-                    { name: "ChatGPT", role: "Campaña", content: "Campaña \"Corazón en Ruta\". 3 videos semanales con testimonios. KPI: 12,000 usuarios nuevos en 60 días.", color: "#00A676" },
-                  ].map((r, i) => (
-                    <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(247,239,226,0.92)", border: "1px solid rgba(4,120,87,0.15)" }}>
-                      <div className="flex items-center gap-2.5 mb-2">
-                        <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white" style={{ background: r.color }}>{r.name[0]}</div>
-                        <div className="flex-1"><div className="text-xs font-bold" style={{ color: INK }}>{r.name}</div><div className="text-2xs" style={{ color: "rgba(31,41,55,0.4)" }}>{r.role}</div></div>
-                        <span style={{ color: EMERALD, fontSize: 14 }}>✓</span>
-                      </div>
-                      <div className="text-xs leading-relaxed" style={{ color: INK }}>{r.content}</div>
-                    </div>
-                  ))}
-
-                  <div className="rounded-xl p-3.5" style={{ background: "linear-gradient(135deg, rgba(76,29,149,0.04), rgba(76,29,149,0.02))", border: "1px solid rgba(76,29,149,0.15)" }}>
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white" style={{ background: PURPLE }}>H</div>
-                      <div className="flex-1"><div className="text-xs font-bold" style={{ color: INK }}>Hermes · Síntesis final</div></div>
-                    </div>
-                    <div className="text-xs leading-relaxed" style={{ color: INK }}>Los 3 agentes coinciden en que Portal de Soledad es viable. Implementar por fases: mes 1-2 validación, mes 3-4 flota, mes 5-6 campaña.</div>
-                    <div className="mt-2.5 rounded-lg p-2.5" style={{ background: "rgba(4,120,87,0.03)", border: "1px solid rgba(4,120,87,0.08)" }}>
-                      <div className="text-2xs font-bold mb-1" style={{ color: EMERALD }}>📋 Pendientes</div>
-                      <div className="text-2xs" style={{ color: INK }}>- Preparar proyección financiera a 6 meses</div>
-                      <div className="text-2xs" style={{ color: INK }}>- Coordinar implementación por fases</div>
-                    </div>
-                    <div className="flex gap-2 mt-2.5">
-                      <button className="px-3 py-1.5 rounded text-2xs font-bold cursor-pointer" style={{ background: "rgba(76,29,149,0.06)", border: "1px solid rgba(76,29,149,0.18)", color: PURPLE }}>💾 Guardar en Obsidian</button>
-                      <button className="px-3 py-1.5 rounded text-2xs font-bold cursor-pointer border-none" style={{ background: EMERALD, color: PARCHMENT }}>✅ Aprobar y cerrar</button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
             </motion.div>
           )}
 
