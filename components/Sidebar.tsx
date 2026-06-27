@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutDashboard, BarChart3, Settings, Target, BookOpen, Database, BookMarked, SunMedium, Inbox, Megaphone, Video, Workflow, Network, BrainCircuit, Menu, X, ChevronDown } from "lucide-react";
+import { LayoutDashboard, BrainCircuit, ChevronDown, Menu, X, SunMedium, Megaphone, Video } from "lucide-react";
 import AgentAvatar from "./AgentAvatar";
 import { PROVIDERS } from "@/lib/providers";
 import type { ProviderId } from "@/lib/providers";
@@ -24,17 +24,6 @@ function NavBtn({id,label,icon:Icon,isActive,onClick}:{id:string;label:string;ic
 const overviewItems = [
   {id:"dashboard", label:"Command Center", icon:LayoutDashboard},
   {id:"orchestrator", label:"Orquestador", icon:BrainCircuit},
-  {id:"today", label:"Hoy ☀️", icon:SunMedium},
-  {id:"inbox", label:"Inbox universal", icon:Inbox},
-  {id:"marketing", label:"Marketing CC", icon:Megaphone},
-  {id:"audiovisuales", label:"Audiovisuales", icon:Video},
-  {id:"workflows", label:"Workflows", icon:Workflow},
-  {id:"empresas", label:"Empresas/Personas", icon:Network},
-  {id:"analytics", label:"Analytics", icon:BarChart3},
-  {id:"goals", label:"Goals 🎯", icon:Target},
-  {id:"journal", label:"Journal 📓", icon:BookOpen},
-  {id:"memory", label:"Memory", icon:Database},
-  {id:"guide", label:"Guía 📖", icon:BookMarked},
 ];
 
 function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavigate:(v:string)=>void;health:Record<string,ProviderHealth>}) {
@@ -99,8 +88,7 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
       </div>
       <div className="mx-3 mb-1" style={{height:1,background:"rgba(255,255,255,0.10)"}}/>
       <div className="p-3 pt-1">
-        <NavBtn id="settings" label="Settings" icon={Settings} isActive={activeView==="settings"} onClick={()=>onNavigate("settings")}/>
-        <div className="mt-3 p-3 rounded-xl" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.12)"}}>
+        <div className="p-3 rounded-xl" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.12)"}}>
           <div className="flex items-center gap-2 mb-2">
             <motion.div className="w-1.5 h-1.5 rounded-full" style={{background:"#00A676"}} animate={{opacity:[1,0.3,1]}} transition={{duration:2,repeat:Infinity}}/>
             <span className="text-[13px] font-black" style={{fontFamily:"var(--font-syne)",color:"#34D399"}}>NEXUS Online</span>
@@ -169,13 +157,10 @@ export default function Sidebar({activeView,onViewChange}:SidebarProps) {
       </AnimatePresence>
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 px-2 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2" style={{background:"linear-gradient(180deg, rgba(247,239,226,0), rgba(247,239,226,0.96) 18%, rgba(52,35,22,0.98))",borderTop:"1px solid rgba(109,40,217,0.10)",backdropFilter:"blur(18px)"}}>
-        <div className="grid grid-cols-5 gap-1 rounded-2xl p-1" style={{background:"rgba(247,239,226,0.92)",border:"1px solid rgba(76,29,149,0.18)"}}>
+        <div className="grid grid-cols-2 gap-1 rounded-2xl p-1 max-w-[200px] mx-auto" style={{background:"rgba(247,239,226,0.92)",border:"1px solid rgba(76,29,149,0.18)"}}>
           {[
             {id:"dashboard",label:"Inicio",icon:LayoutDashboard},
-            {id:"orchestrator",label:"AI",icon:BrainCircuit},
-            {id:"today",label:"Hoy",icon:SunMedium},
-            {id:"marketing",label:"Mkt",icon:Megaphone},
-            {id:"audiovisuales",label:"Audiov.",icon:Video},
+            {id:"orchestrator",label:"Orquest.",icon:BrainCircuit},
           ].map(({id,label,icon:Icon})=>{
             const isActive=activeView===id;
             return <button type="button" key={id} onClick={()=>onViewChange(id)} className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2.5" style={{background:isActive?"rgba(76,29,149,0.14)":"rgba(109,40,217,0)",border:isActive?"1px solid rgba(76,29,149,0.32)":"1px solid rgba(109,40,217,0)",color:isActive?"#4C1D95":"#07182E",fontFamily:"var(--font-outfit)"}}>
