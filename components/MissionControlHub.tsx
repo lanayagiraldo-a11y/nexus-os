@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AgentAvatar from "./AgentAvatar";
 import ConsejoSimple from "./ConsejoSimple";
+import QueuePanel from "./QueuePanel";
 
 // Colors
 const PURPLE = "#4C1D95";
@@ -10,7 +11,7 @@ const PARCHMENT = "#F7EFE2";
 const INK = "#07182E";
 const EMERALD = "#047857";
 
-type TabId = "chat" | "consejo" | "workflow";
+type TabId = "chat" | "consejo" | "workflow" | "cola";
 
 interface Message {
   id: number;
@@ -238,6 +239,7 @@ export default function MissionControlHub() {
           { id: "chat" as TabId, label: "💬 Chat", count: messages.filter(m => m.role === "agent").length },
           { id: "consejo" as TabId, label: "🧠 Consejo" },
           { id: "workflow" as TabId, label: "🔀 Workflow", count: workflows.length },
+          { id: "cola" as TabId, label: "🗂️ Cola" },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className="pb-2.5 px-4 text-sm font-bold border-b-2 bg-transparent cursor-pointer transition-colors"
@@ -385,6 +387,12 @@ export default function MissionControlHub() {
                   </div>
                 </div>
               ))}
+            </motion.div>
+          )}
+
+          {activeTab === "cola" && (
+            <motion.div key="cola" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-hidden">
+              <QueuePanel />
             </motion.div>
           )}
         </AnimatePresence>
