@@ -6,7 +6,7 @@ import AgentAvatar from "./AgentAvatar";
 import { PROVIDERS } from "@/lib/providers";
 import type { ProviderId } from "@/lib/providers";
 
-const ACCENT: Record<ProviderId,string> = { claude:"#F72585", openai:"#00A676", gemini:"#5F8C94", hermes:"#A855F7" };
+const ACCENT: Record<string,string> = { hermes:"#4C1D95", perplexity:"#00A676", gemini:"#2563EB", elevenlabs:"#D97706", imagegen:"#F72585", claude:"#7C3AED", codex:"#059669" };
 
 interface SidebarProps { activeView: string; onViewChange: (v:string)=>void; }
 interface ProviderHealth { id: ProviderId; configured?: boolean; reachable?: boolean; error?: string; }
@@ -21,12 +21,21 @@ function NavBtn({id,label,icon:Icon,isActive,onClick}:{id:string;label:string;ic
   );
 }
 
-const overviewItems = [
-  {id:"dashboard", label:"Command Center", icon:LayoutDashboard},
-  {id:"orchestrator", label:"Orquestador", icon:BrainCircuit},
+const AGENTS = [
+  {id:"hermes", name:"Hermes", model:"DeepSeek v4", color:"#4C1D95", status:"Libre", dot:"#00A676"},
+  {id:"perplexity", name:"Perplexity", model:"Sonar Pro", color:"#00A676", status:"Listo", dot:"#00A676"},
+  {id:"gemini", name:"Gemini", model:"2.5 Flash", color:"#2563EB", status:"Informando", dot:"#D97706"},
+  {id:"elevenlabs", name:"ElevenLabs", model:"TTS v2", color:"#D97706", status:"Listo", dot:"#00A676"},
+  {id:"imagegen", name:"Image Gen", model:"FLUX 2", color:"#F72585", status:"Listo", dot:"#00A676"},
+  {id:"claude", name:"Claude", model:"Sonnet 4.6", color:"#7C3AED", status:"Inactivo", dot:"rgba(255,255,255,0.25)"},
+  {id:"codex", name:"Codex", model:"GPT 5", color:"#059669", status:"Inactivo", dot:"rgba(255,255,255,0.25)"},
 ];
 
-function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavigate:(v:string)=>void;health:Record<string,ProviderHealth>}) {
+const overviewItems = [
+  {id:"dashboard", label:"Command Center", icon:LayoutDashboard},
+];
+
+function SidebarContent({activeView,onNavigate}:{activeView:string;onNavigate:(v:string)=>void;health?:never}) {
   const [agentsOpen, setAgentsOpen] = useState(true);
 
   useEffect(() => {
@@ -37,46 +46,27 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
     <>
       <div className="p-3 pb-2">
         <button type="button" aria-expanded={agentsOpen} onClick={()=>setAgentsOpen(open=>!open)} className="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left" style={{background:"rgba(255,255,255,0.10)",border:"1px solid rgba(255,255,255,0.24)",cursor:"pointer"}}>
-          <div>
-            <p className="text-[12px] tracking-[0.20em] uppercase font-black" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.92)"}}>AI Agents</p>
-            <div className="mt-1 text-[20px] font-black leading-tight" style={{fontFamily:"var(--font-outfit)",color:"#FFFFFF",textShadow:"0 2px 12px rgba(0,0,0,0.40)"}}>Agentes en uso</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="rounded-full px-2 py-1 text-[12px] font-black" style={{fontFamily:"var(--font-jetbrains)",color:"#FFFFFF",background:"rgba(139,28,246,0.42)",border:"1px solid rgba(255,255,255,0.20)"}}>{PROVIDERS.length}</span>
-            <motion.span animate={{rotate:agentsOpen?180:0}} transition={{duration:0.18}} style={{color:"#FFFFFF"}}><ChevronDown size={20}/></motion.span>
-          </div>
+          <div><p className="text-[12px] tracking-[0.20em] uppercase font-black" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.90)"}}>AI AGENTS</p><p className="text-[18px] font-black" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF"}}>Agentes en uso</p></div>
+          <div className="flex items-center gap-2"><span className="rounded-full px-2.5 py-0.5 text-xs font-black text-white" style={{background:"rgba(168,85,247,0.60)"}}>{AGENTS.length}</span><ChevronDown size={16} style={{color:"rgba(255,255,255,0.72)",transform:agentsOpen?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.25s cubic-bezier(0.22,1,0.36,1)"}}/></div>
         </button>
         <AnimatePresence initial={false}>
           {agentsOpen&&(
             <motion.div className="mt-2 space-y-1.5" initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} transition={{duration:0.22,ease:[0.22,1,0.36,1]}}>
-              {PROVIDERS.map((p,i)=>{
-                const viewId=`agent-${p.id}`;
-                const isActive=activeView===viewId;
-                const color=ACCENT[p.id as ProviderId];
-                const status = health[p.id];
-                const online = status?.reachable === true;
-                const configured = status?.configured !== false;
-                const hasError = configured && status?.reachable === false;
-                const statusLabel = online ? "Online" : hasError ? "Error" : configured ? "Standby" : "Setup";
-                const statusColor = online ? "#00A676" : hasError ? "#EF4444" : configured ? "#E2B24F" : "#EF4444";
-                return (
-                  <motion.button type="button" key={p.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.03+i*0.04}} onClick={()=>onNavigate(viewId)} className="group relative flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left" style={{background:isActive?`linear-gradient(90deg, rgba(${p.accentRgb},0.36), rgba(${p.accentRgb},0.14))`:"rgba(255,255,255,0.05)",border:isActive?`1px solid rgba(255,255,255,0.30)`:"1px solid rgba(255,255,255,0.10)",boxShadow:isActive?`0 0 18px rgba(${p.accentRgb},0.20)`:"none",cursor:"pointer"}} whileHover={{background:`rgba(${p.accentRgb},0.18)`,x:1}} whileTap={{scale:0.98}}>
-                    {isActive&&<motion.div layoutId="nav-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full" style={{background:color}} transition={{type:"spring",stiffness:450,damping:35}}/>}
-                    <div className="relative shrink-0">
-                      <AgentAvatar provider={p.id as ProviderId} size={30}/>
-                      <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full" style={{background:statusColor,border:"1px solid rgba(52,35,22,0.95)",boxShadow:`0 0 8px ${statusColor}`}} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[18px] font-black leading-tight" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF",textShadow:"0 2px 12px rgba(0,0,0,0.40)"}}>{p.name}</div>
-                      <div className="text-[13px] truncate mt-0.5 font-bold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.86)"}}>{p.modelLabel}</div>
-                    </div>
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{background:`rgba(${online ? "138,154,85" : configured ? "226,178,79" : "196,98,58"},0.08)`,border:`1px solid ${statusColor}33`}}>
-                      <span className="h-1.5 w-1.5 rounded-full" style={{background:statusColor}} />
-                      <span className="text-[8px] uppercase" style={{fontFamily:"var(--font-jetbrains)",color:statusColor}}>{statusLabel}</span>
-                    </div>
-                  </motion.button>
-                );
-              })}
+              {AGENTS.map((a,i)=>(
+                <motion.div key={a.id} initial={{x:-16,opacity:0}} animate={{x:0,opacity:1}} transition={{delay:0.03+i*0.04}}
+                  className="relative flex items-center gap-3 w-full px-4 py-2.5 rounded-xl"
+                  style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                  <div className="relative shrink-0">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{background:a.color}}>{a.name[0]}</div>
+                    <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full" style={{background:a.dot,border:"1px solid rgba(52,35,22,0.95)"}} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-black leading-tight" style={{color:"#FFFFFF"}}>{a.name}</div>
+                    <div className="text-[11px] truncate" style={{color:"rgba(255,255,255,0.6)"}}>{a.model}</div>
+                  </div>
+                  <div className="text-[10px] font-semibold" style={{color:a.dot}}>{a.status}</div>
+                </motion.div>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
@@ -96,7 +86,7 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
           <div className="flex gap-1">
             {[...Array(5)].map((_,i)=><motion.div key={i} className="flex-1 h-0.5 rounded-full" style={{background:"#00A676"}} animate={{scaleX:[0.3,1,0.3],opacity:[0.3,0.8,0.3]}} transition={{duration:1.4,repeat:Infinity,delay:i*0.12,ease:"easeInOut"}}/>)}
           </div>
-          <div className="mt-1 text-[11px] font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.70)"}}>{PROVIDERS.length} agents registered</div>
+          <div className="mt-1 text-[11px] font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.70)"}}>{AGENTS.length} agents registrados</div>
         </div>
       </div>
     </>
@@ -104,34 +94,23 @@ function SidebarContent({activeView,onNavigate,health}:{activeView:string;onNavi
 }
 
 export default function Sidebar({activeView,onViewChange}:SidebarProps) {
-  const [health, setHealth] = useState<Record<string, ProviderHealth>>({});
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    const loadHealth = async () => {
-      try {
-        const response = await fetch("/api/providers", { cache: "no-store" });
-        const payload = await response.json() as { providers?: ProviderHealth[] };
-        if (!cancelled) setHealth(Object.fromEntries((payload.providers ?? []).map(p => [p.id, p])));
-      } catch {
-        if (!cancelled) setHealth({});
-      }
-    };
-    loadHealth();
-    const timer = window.setInterval(loadHealth, 30_000);
-    return () => { cancelled = true; window.clearInterval(timer); };
-  }, []);
-
-  const navigate = (view:string) => {
+  const navigate = (view: string) => {
     onViewChange(view);
     setMobileOpen(false);
   };
 
   return (
     <>
-      <motion.aside initial={false} animate={{x:0,opacity:1}} transition={{duration:0.3,ease:[0.22,1,0.36,1]}} className="hidden md:flex flex-col overflow-y-auto" style={{width:300,flexShrink:0,background:"linear-gradient(180deg, rgba(24,24,27,0.99), rgba(39,39,42,0.99))",borderRight:"1px solid rgba(255,255,255,0.20)",backdropFilter:"blur(20px)"}}>
-        <SidebarContent activeView={activeView} onNavigate={navigate} health={health}/>
+      <motion.aside className="hidden md:flex flex-col overflow-y-auto flex-shrink-0" style={{width:318,background:"linear-gradient(180deg, rgba(24,24,27,0.99), rgba(39,39,42,0.99))",borderRight:"1px solid rgba(255,255,255,0.18)",boxShadow:"24px 0 80px rgba(7,24,46,0.42)",backdropFilter:"blur(24px)"}}>
+        <div className="flex items-center gap-2 px-5 py-4 border-b" style={{borderColor:"rgba(109,40,217,0.10)"}}>
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg" style={{background:"linear-gradient(135deg, rgba(168,85,247,0.36), rgba(168,85,247,0.12))"}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#A855F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+          <div><div className="text-sm font-black tracking-[0.12em]" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF"}}>NEXUS</div><div className="text-[10px] uppercase tracking-[0.16em] font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.72)"}}>v2.1.0 · CORE ACTIVE</div></div>
+        </div>
+        <SidebarContent activeView={activeView} onNavigate={navigate} />
       </motion.aside>
 
       <button type="button" aria-label="Abrir barra izquierda" onClick={()=>setMobileOpen(true)} className="md:hidden fixed left-3 top-[70px] z-50 flex items-center gap-2 rounded-full px-4 py-2.5 shadow-lg" style={{background:"rgba(40,24,54,0.96)",border:"1px solid rgba(255,255,255,0.18)",color:"#FFFFFF",fontFamily:"var(--font-outfit)",backdropFilter:"blur(14px)"}}>
@@ -150,7 +129,7 @@ export default function Sidebar({activeView,onViewChange}:SidebarProps) {
                 </div>
                 <button type="button" aria-label="Cerrar barra izquierda" onClick={()=>setMobileOpen(false)} className="rounded-full p-2" style={{background:"rgba(255,255,255,0.10)",color:"#FFFFFF"}}><X size={18}/></button>
               </div>
-              <SidebarContent activeView={activeView} onNavigate={navigate} health={health}/>
+              <SidebarContent activeView={activeView} onNavigate={navigate} />
             </motion.aside>
           </>
         )}
