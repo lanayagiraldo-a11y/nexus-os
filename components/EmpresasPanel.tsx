@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const PURPLE = "#4C1D95";
 const INK = "#07182E";
@@ -25,6 +25,9 @@ function isFullConnection(directive: string): boolean {
   const parts = directive.trim().split(/\s+/);
   return parts.length === 1; // solo el proveedor, sin resource/agg => conexión completa
 }
+function isFile(directive: string): boolean {
+  return /^(file|doc)\b/.test(directive.trim());
+}
 
 export default function EmpresasPanel() {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
@@ -32,6 +35,7 @@ export default function EmpresasPanel() {
   const [busy, setBusy] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState("");
   const [preview, setPreview] = useState<{ label: string; ok: boolean; error?: string }[] | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     const d = await api({ action: "list" });
@@ -67,6 +71,21 @@ export default function EmpresasPanel() {
     const d = await api({ action: "add-source", empresaId: sel.id, label: nombre, directive });
     if (Array.isArray(d.empresas)) setEmpresas(d.empresas);
     setBusy(false);
+  };
+
+  const uploadDoc = async (file: File | undefined) => {
+    if (!file || !sel) return;
+    setBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("empresaId", sel.id);
+      const d = await (await fetch("/api/empresas/upload", { method: "POST", body: fd })).json();
+      if (Array.isArray(d.empresas)) setEmpresas(d.empresas);
+      else alert(`No se pudo subir: ${d.error || "error"}`);
+    } catch (e) { alert(`Error: ${e instanceof Error ? e.message : String(e)}`); }
+    setBusy(false);
+    if (fileRef.current) fileRef.current.value = "";
   };
 
   const delSource = async (sourceId: string) => {
@@ -131,9 +150,9 @@ export default function EmpresasPanel() {
                       <div className="min-w-0">
                         <div className="text-sm font-semibold flex items-center gap-1.5" style={{ color: INK }}>
                           {preview && <span>{pv ? (pv.ok ? "✅" : "⛔") : "•"}</span>}
-                          🔌 {connectionName(s.directive)}
+                          {isFile(s.directive) ? `📄 ${s.label}` : `🔌 ${connectionName(s.directive)}`}
                         </div>
-                        <div className="text-xs opacity-50" style={{ color: INK }}>{isFullConnection(s.directive) ? "conexión completa · todos los datos del API" : "consulta específica"}</div>
+                        <div className="text-xs opacity-50" style={{ color: INK }}>{isFile(s.directive) ? "documento subido" : isFullConnection(s.directive) ? "conexión completa · todos los datos del API" : "consulta específica"}</div>
                         {pv && !pv.ok && <div className="text-xs" style={{ color: "#D73A4A" }}>{pv.error}</div>}
                       </div>
                       <button onClick={() => delSource(s.id)} disabled={busy} className="text-xs px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: "rgba(31,41,55,0.06)", color: INK }}>✕</button>
@@ -141,6 +160,17 @@ export default function EmpresasPanel() {
                   );
                 })}
                 {!sel.sources.length && <div className="text-xs opacity-40" style={{ color: INK }}>Sin conexiones. Conecta una abajo.</div>}
+              </div>
+
+              {/* Subir documento como fuente */}
+              <div className="rounded-lg p-2.5 mb-2" style={{ background: "rgba(11,110,153,0.05)" }}>
+                <div className="text-xs font-bold mb-1.5" style={{ color: "#0B6E99" }}>📄 Subir documento</div>
+                <input ref={fileRef} type="file" accept=".xlsx,.xls,.docx,.pdf,.csv,.tsv,.txt,.json,.md,.html" className="hidden" onChange={(e) => uploadDoc(e.target.files?.[0])} />
+                <button onClick={() => fileRef.current?.click()} disabled={busy}
+                  className="text-xs px-3 py-2 rounded-lg font-semibold w-full text-left" style={{ background: "#fff", border: "1px solid rgba(11,110,153,0.2)", color: "#0B6E99" }}>
+                  {busy ? "⏳ Procesando…" : "⬆️ Word · Excel · PDF · CSV · TXT"}
+                </button>
+                <div className="text-2xs opacity-50 mt-1" style={{ color: INK }}>Se lee el contenido y queda como fuente de {sel.nombre}.</div>
               </div>
 
               {/* Conectar fuentes (un clic = acceso completo al API) */}

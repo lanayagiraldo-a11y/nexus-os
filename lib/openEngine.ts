@@ -212,6 +212,34 @@ export async function closeIssue(number: number): Promise<void> {
   });
 }
 
+// ---------- Documentos (archivos subidos) ----------
+// Cada documento se guarda como un issue cerrado etiquetado `nexus-file`, con el
+// texto extraído en el cuerpo. Persistente y sin almacenamiento extra.
+
+const FILE_LABEL = "nexus-file";
+const DOC_MARKER = "<!--nexus-doc-->";
+
+/** Guarda el texto de un documento en un issue y devuelve su número. */
+export async function createDoc(name: string, text: string): Promise<number> {
+  try {
+    await gh(`/repos/${REPO}/labels`, { method: "POST", body: JSON.stringify({ name: FILE_LABEL, color: "0b6e99", description: "Documento subido como fuente" }) });
+  } catch { /* ya existe */ }
+  const body = `${DOC_MARKER}\n# 📄 ${name}\n\n${text}`.slice(0, 65000);
+  const issue = await gh<{ number: number }>(`/repos/${REPO}/issues`, {
+    method: "POST",
+    body: JSON.stringify({ title: `📄 FILE: ${name}`.slice(0, 250), body, labels: [FILE_LABEL] }),
+  });
+  // Cerramos el issue: es almacenamiento, no una petición de la cola.
+  await gh(`/repos/${REPO}/issues/${issue.number}`, { method: "PATCH", body: JSON.stringify({ state: "closed" }) });
+  return issue.number;
+}
+
+/** Lee el texto de un documento guardado (sin el marcador/encabezado). */
+export async function readDoc(number: number): Promise<string> {
+  const issue = await gh<{ body: string | null }>(`/repos/${REPO}/issues/${number}`);
+  return (issue.body ?? "").replace(DOC_MARKER, "").trim();
+}
+
 /** Crea (o asegura) las etiquetas de estado en el repo. Idempotente. */
 export async function setupLabels(): Promise<{ created: string[]; existing: string[] }> {
   const created: string[] = [];

@@ -3,9 +3,9 @@ import { parseUpload } from "@/lib/sources";
 
 export const runtime = "nodejs";
 
-const MAX_BYTES = 8_000_000; // 8 MB
+const MAX_BYTES = 4_000_000; // ~4 MB (límite de body de funciones en Vercel)
 const MAX_CHARS = 24_000;
-const ALLOWED = [".xlsx", ".xls", ".csv", ".tsv", ".txt", ".json", ".md", ".html", ".htm"];
+const ALLOWED = [".xlsx", ".xls", ".docx", ".pdf", ".csv", ".tsv", ".txt", ".json", ".md", ".html", ".htm"];
 
 /**
  * Sube un archivo y lo convierte a texto para usarlo como fuente en el chat/consejo/cola.

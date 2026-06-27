@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  // Que se carguen desde node_modules en runtime (no se empaquetan): evita el
+  // problema del worker de pdfjs y mantiene mammoth funcionando en el servidor.
+  serverExternalPackages: ["pdf-parse", "pdfjs-dist", "mammoth"],
 };
 
 export default nextConfig;

@@ -95,10 +95,21 @@ async function bufferToReadable(buf: ArrayBuffer, contentType: string, url?: str
   return contentType.includes("text/html") ? htmlToText(text) : text;
 }
 
-/** Parsea un archivo subido (xlsx/csv/txt/json/md/html) a texto legible para el agente. */
+/** Parsea un archivo subido a texto legible: Excel, Word, PDF, csv/txt/json/md/html. */
 export async function parseUpload(buffer: ArrayBuffer, filename: string): Promise<string> {
   const lower = filename.toLowerCase();
   if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) return xlsxToText(buffer);
+  if (lower.endsWith(".docx")) {
+    const mammoth = await import("mammoth");
+    const r = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
+    return r.value;
+  }
+  if (lower.endsWith(".pdf")) {
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: new Uint8Array(buffer) });
+    const r = await parser.getText();
+    return r.text;
+  }
   const text = new TextDecoder("utf-8", { fatal: false }).decode(buffer);
   if (lower.endsWith(".html") || lower.endsWith(".htm")) return htmlToText(text);
   return text; // csv, tsv, txt, json, md, etc.
@@ -332,9 +343,23 @@ async function fetchGestivoSource(d: SourceDirective): Promise<SourceResult> {
 
 // ---------- Resolución ----------
 
+async function fetchFileSource(d: SourceDirective): Promise<SourceResult> {
+  const type = "file";
+  try {
+    const num = Number(d.args.issue);
+    if (!num) throw new Error("Falta issue=<n> del documento");
+    const { readDoc } = await import("@/lib/openEngine");
+    const text = await readDoc(num);
+    return { type, label: d.args.name ? `Documento: ${d.args.name}` : `Documento #${num}`, ok: true, content: trim(text) };
+  } catch (e) {
+    return { type, label: "Documento", ok: false, content: "", error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 export async function resolveOneSource(d: SourceDirective): Promise<SourceResult> {
   switch (d.type) {
     case "url": return fetchUrlSource(d.args.url || d.rest.trim());
+    case "file": case "doc": return fetchFileSource(d);
     case "supabase": case "postgres": return fetchSupabaseSource(d.args);
     case "apify": return fetchApifySource(d.args);
     case "sharepoint": case "excel": return fetchSharepointSource(d.args);
