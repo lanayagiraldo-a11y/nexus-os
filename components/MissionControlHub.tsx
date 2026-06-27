@@ -20,6 +20,7 @@ interface Message {
   time: string;
   extra?: "perplexity" | "image" | "audio" | "pdf";
   extraLabel?: string;
+  loading?: boolean;
 }
 
 const AGENTS = [
@@ -75,12 +76,103 @@ export default function MissionControlHub() {
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    const text = input.trim();
+    if (!text) return;
     setMessages(prev => [...prev, {
-      id: Date.now(), role: "user", text: input, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      id: Date.now(), role: "user", text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }]);
     setInput("");
+
+    // Add a loading message
+    const loadingId = Date.now() + 1;
+    setMessages(prev => [...prev, {
+      id: loadingId, role: "agent", agent: "Hermes",
+      agentLabel: "⚡ Hermes", text: "Procesando…",
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      loading: true,
+    }]);
+
+    try {
+      const lower = text.toLowerCase();
+      let result: { content: string; extra?: string; extraLabel?: string; agentLabel?: string } | null = null;
+
+      // Detect intent: investigation/research
+      if (/investiga|busca|competidores|investigación|research|análisis de mercado|precios/i.test(lower)) {
+        const resp = await fetch("/api/perplexity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          result = {
+            content: "Aquí tienes los resultados de la investigación:",
+            extra: "perplexity",
+            extraLabel: data.content,
+            agentLabel: "🔍 Hermes vía Perplexity",
+          };
+        } else throw new Error(data.error || "Error en Perplexity");
+      }
+
+      // Detect intent: image generation
+      else if (/crea.*imagen|genera.*imagen|imagen.*campaña|diseño.*visual|imagen/i.test(lower)) {
+        const resp = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          result = {
+            content: "Imagen generada:",
+            extra: "image",
+            agentLabel: "🎨 Hermes vía Image Gen",
+          };
+        } else throw new Error(data.error || "Error en generación");
+      }
+
+      // Detect intent: audio
+      else if (/crea.*audio|audio|voz|locución|diciendo/i.test(lower)) {
+        const audioText = text.replace(/crea un audio|audio|diciendo|locución|voz/gi, "").trim() || text;
+        const resp = await fetch("/api/elevenlabs/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: audioText }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          result = {
+            content: "Audio generado:",
+            extra: "audio",
+            agentLabel: "🎤 Hermes vía ElevenLabs",
+          };
+        } else throw new Error(data.error || "Error en audio");
+      }
+
+      // Default: use HuggingFace or general response via internal API
+      else {
+        result = {
+          content: "Entendido. Usa el Consejo de Agentes (🧠) si necesitas un análisis más completo con múltiples agentes. Por ahora puedes escribir 'investiga X', 'crea una imagen Y' o 'crea un audio Z' para usar los MCP conectados.",
+          agentLabel: "🧠 Hermes",
+        };
+      }
+
+      // Replace loading message with result
+      setMessages(prev => prev.map(m => m.id === loadingId ? {
+        ...m,
+        text: result?.content || "Listo",
+        extra: result?.extra as any,
+        extraLabel: result?.extraLabel,
+        agentLabel: result?.agentLabel || "⚡ Hermes",
+        loading: false,
+      } : m));
+
+    } catch (err: any) {
+      setMessages(prev => prev.map(m => m.id === loadingId ? {
+        ...m, text: `Error: ${err.message}`, loading: false,
+      } : m));
+    }
   };
 
   const toggleAgent = (agent: string) => {
@@ -161,7 +253,14 @@ export default function MissionControlHub() {
                         borderBottomLeftRadius: msg.role === "agent" ? 3 : 11,
                       }}>
                       {msg.agentLabel && <div className="flex items-center gap-1.5 mb-1 text-xs font-bold" style={{ color: PURPLE }}>{msg.agentLabel}</div>}
-                      <div>{msg.text}</div>
+                      {msg.loading ? (
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: `${PURPLE}20`, borderTopColor: PURPLE }} />
+                          <span>Procesando…</span>
+                        </div>
+                      ) : (
+                        <div>{msg.text}</div>
+                      )}
 
                       {(msg.extra === "perplexity" && msg.extraLabel) && (
                         <div className="mt-2 rounded-lg p-3 text-xs" style={{ background: "rgba(247,239,226,0.7)", border: "1px solid rgba(4,120,87,0.12)" }}>
