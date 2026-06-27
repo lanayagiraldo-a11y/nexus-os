@@ -33,6 +33,13 @@ export default function QueuePanel() {
   const [toast, setToast] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
+  const [empresas, setEmpresas] = useState<{ id: string; nombre: string; sources: unknown[] }[]>([]);
+  const [empresaSel, setEmpresaSel] = useState("");
+
+  useEffect(() => {
+    fetch("/api/empresas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "list" }) })
+      .then((r) => r.json()).then((d) => { if (Array.isArray(d.empresas)) setEmpresas(d.empresas); }).catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,7 +70,7 @@ export default function QueuePanel() {
   const create = async () => {
     if (!newTitle.trim()) return;
     setBusy("create");
-    const r = await api({ action: "create-issue", title: newTitle.trim(), body: newBody.trim() });
+    const r = await api({ action: "create-issue", title: newTitle.trim(), body: newBody.trim(), empresa: empresaSel || undefined });
     flash(r.issue ? `Creada #${r.issue.number}` : (r.error || "Error"));
     setNewTitle(""); setNewBody(""); setBusy(null); load();
   };
@@ -87,7 +94,14 @@ export default function QueuePanel() {
 
       {/* Nueva petición */}
       <div className="mb-4 rounded-xl p-3" style={{ background: "rgba(247,239,226,0.92)", border: "1px solid rgba(76,29,149,0.06)" }}>
-        <div className="text-xs font-bold mb-2" style={{ color: PURPLE }}>➕ Nueva petición</div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-bold" style={{ color: PURPLE }}>➕ Nueva petición</span>
+          <select value={empresaSel} onChange={(e) => setEmpresaSel(e.target.value)} className="text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"
+            style={{ border: `1px solid ${empresaSel ? PURPLE : "rgba(31,41,55,0.12)"}`, color: empresaSel ? PURPLE : INK, fontWeight: 600 }}>
+            <option value="">🏢 Sin empresa</option>
+            {empresas.map((e) => <option key={e.id} value={e.id}>{e.nombre}</option>)}
+          </select>
+        </div>
         <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Título (ej: [hermes] Reporte semanal La Carolina)"
           className="w-full text-sm px-2.5 py-1.5 rounded-lg mb-2 outline-none" style={{ border: "1px solid rgba(31,41,55,0.12)", color: INK }} />
         <textarea value={newBody} onChange={(e) => setNewBody(e.target.value)} rows={2}

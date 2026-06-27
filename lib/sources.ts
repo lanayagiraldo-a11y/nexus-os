@@ -255,16 +255,25 @@ async function fetchGestivoSource(d: SourceDirective): Promise<SourceResult> {
     if (!key) throw new Error("Configura GESTIVO_API_KEY en .env.local");
     const headers = { "x-api-key": key, "Content-Type": "application/json" };
 
-    // 1) Esquema
-    if (d.args.schema || (!d.args.resource && /\bschema\b/i.test(d.rest))) {
+    // 1) Conexión completa / esquema: "@source: gestivo" (pelado) o schema=true
+    //    expone TODO el catálogo del API (todos los recursos, columnas y operaciones).
+    if (d.args.schema || (!d.args.resource && !d.args.agg)) {
       const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/schema`, { headers, signal: AbortSignal.timeout(20_000) });
       const text = await resp.text();
       if (!resp.ok) throw new Error(`GESTIVO schema ${resp.status}: ${text.slice(0, 300)}`);
-      return { type, label: "GESTIVO: esquema", ok: true, content: trim(text) };
+      const guide = [
+        "CONEXIÓN GESTIVO (API de solo lectura). Tienes acceso a TODOS estos recursos y 3 operaciones:",
+        "- query: trae filas (filtros: eq/neq/gt/gte/lt/lte/like/ilike/in/is; pagina con offset/nextOffset).",
+        "- aggregate: para 'quién tiene más', 'cuántos por X', totales/promedios (group_by + agg=count|sum|avg|min|max).",
+        "- schema: el catálogo de abajo. Úsalo para no inventar nombres de recursos/columnas.",
+        "",
+        text,
+      ].join("\n");
+      return { type, label: "GESTIVO (conexión completa)", ok: true, content: trim(guide) };
     }
 
     const resource = d.args.resource;
-    if (!resource) throw new Error("Falta resource= (ej: @source: gestivo resource=conductores_con_grupo) o usa schema=true");
+    if (!resource) throw new Error("Falta resource= o usa una conexión completa: @source: gestivo");
     const filters = parseWhere(d.rest);
 
     // 3) Agregación (quién tiene más / cuántos por X / totales / promedios)

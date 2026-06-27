@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import AgentAvatar from "./AgentAvatar";
 import ConsejoSimple from "./ConsejoSimple";
 import QueuePanel from "./QueuePanel";
+import EmpresasPanel from "./EmpresasPanel";
 
 // Colors
 const PURPLE = "#4C1D95";
@@ -11,7 +12,9 @@ const PARCHMENT = "#F7EFE2";
 const INK = "#07182E";
 const EMERALD = "#047857";
 
-type TabId = "chat" | "consejo" | "workflow" | "cola";
+type TabId = "chat" | "consejo" | "workflow" | "cola" | "empresas";
+
+interface EmpresaLite { id: string; nombre: string; sources: unknown[] }
 
 interface Message {
   id: number;
@@ -38,6 +41,13 @@ const AGENTS = [
 
 export default function MissionControlHub() {
   const [activeTab, setActiveTab] = useState<TabId>("chat");
+  const [empresas, setEmpresas] = useState<EmpresaLite[]>([]);
+  const [empresaSel, setEmpresaSel] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/api/empresas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "list" }) })
+      .then((r) => r.json()).then((d) => { if (Array.isArray(d.empresas)) setEmpresas(d.empresas); }).catch(() => {});
+  }, [activeTab]);
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, role: "user", text: "Investiga los competidores de Taqwa Team y dame precios y servicios", time: "10:32", agent: "user" },
     { id: 2, role: "agent", agent: "Hermes", agentLabel: "⚡ Hermes vía Perplexity", text: "Busqué información actualizada de competidores en El Salvador.", time: "10:32", extra: "perplexity", extraLabel: "FROOZY: $3.50 · 5 sabores\nSnowIce: $4.00 · 3 sabores\nChillBox: $2.80 · 2 sabores\n3 fuentes consultadas" },
@@ -177,12 +187,45 @@ export default function MissionControlHub() {
         } else throw new Error(data.error || "Error en audio");
       }
 
-      // Default: use HuggingFace or general response via internal API
+      // Default: chat real con el agente, usando SOLO el contexto de la empresa seleccionada.
       else {
-        result = {
-          content: "Entendido. Usa el Consejo de Agentes (🧠) si necesitas un análisis más completo con múltiples agentes. Por ahora puedes escribir 'investiga X', 'crea una imagen Y' o 'crea un audio Z' para usar los MCP conectados.",
-          agentLabel: "🧠 Hermes",
-        };
+        const empresaNombre = empresas.find((e) => e.id === empresaSel)?.nombre;
+        const tag = empresaNombre ? `🏢 ${empresaNombre} · ` : "";
+        const resp = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ provider: "hermes", message: text, empresa: empresaSel || undefined }),
+        });
+        if (!resp.ok || !resp.body) {
+          const e = await resp.json().catch(() => ({}));
+          throw new Error(e.error || `Error ${resp.status}`);
+        }
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let acc = "", buf = "", errMsg = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const events = buf.split("\n\n"); buf = events.pop() ?? "";
+          for (const ev of events) {
+            const line = ev.split("\n").find((l) => l.startsWith("data: "));
+            if (!line) continue;
+            const raw = line.slice(6).trim();
+            if (!raw) continue;
+            let data: { text?: string; error?: string; heartbeat?: boolean; status?: string };
+            try { data = JSON.parse(raw); } catch { continue; }
+            if (data.heartbeat || data.status) continue;
+            if (data.error) { errMsg = data.error; continue; }
+            if (data.text) {
+              acc += data.text;
+              setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, text: acc, agentLabel: `${tag}⚡ Hermes`, loading: false } : m));
+            }
+          }
+        }
+        if (errMsg && !acc) throw new Error(errMsg);
+        if (!acc) throw new Error("El agente no devolvió respuesta. Revisa que Hermes esté corriendo o que haya una API key configurada.");
+        return; // el mensaje ya se actualizó en streaming
       }
 
       // Replace loading message with result
@@ -240,6 +283,7 @@ export default function MissionControlHub() {
           { id: "consejo" as TabId, label: "🧠 Consejo" },
           { id: "workflow" as TabId, label: "🔀 Workflow", count: workflows.length },
           { id: "cola" as TabId, label: "🗂️ Cola" },
+          { id: "empresas" as TabId, label: "🏢 Empresas" },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className="pb-2.5 px-4 text-sm font-bold border-b-2 bg-transparent cursor-pointer transition-colors"
@@ -264,6 +308,17 @@ export default function MissionControlHub() {
         <AnimatePresence mode="wait">
           {activeTab === "chat" && (
             <motion.div key="chat" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex flex-col p-4">
+              {/* Selector de empresa: aísla el contexto del chat */}
+              <div className="flex items-center gap-2 mb-2 flex-shrink-0">
+                <span className="text-xs font-semibold" style={{ color: "rgba(31,41,55,0.5)" }}>🏢 Contexto:</span>
+                <select value={empresaSel} onChange={(e) => setEmpresaSel(e.target.value)}
+                  className="text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"
+                  style={{ border: `1px solid ${empresaSel ? PURPLE : "rgba(31,41,55,0.12)"}`, color: empresaSel ? PURPLE : INK, fontWeight: 600, background: empresaSel ? "rgba(76,29,149,0.06)" : "#fff" }}>
+                  <option value="">Sin empresa (general)</option>
+                  {empresas.map((e) => <option key={e.id} value={e.id}>{e.nombre} ({e.sources.length} fuentes)</option>)}
+                </select>
+                {empresaSel && <span className="text-xs" style={{ color: "rgba(31,41,55,0.4)" }}>solo usa datos de esta empresa</span>}
+              </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-1">
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -393,6 +448,12 @@ export default function MissionControlHub() {
           {activeTab === "cola" && (
             <motion.div key="cola" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-hidden">
               <QueuePanel />
+            </motion.div>
+          )}
+
+          {activeTab === "empresas" && (
+            <motion.div key="empresas" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-hidden">
+              <EmpresasPanel />
             </motion.div>
           )}
         </AnimatePresence>
