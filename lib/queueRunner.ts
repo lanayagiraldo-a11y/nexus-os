@@ -10,6 +10,7 @@ import { addReceipt, getIssue, listQueue, setAgentState, type QueueIssue } from 
 import { orchestrateMission } from "@/lib/orchestrator";
 import { PROVIDERS, type ProviderId } from "@/lib/providers";
 import { resolveSources } from "@/lib/sources";
+import { getEmpresa, empresaSourcesBody } from "@/lib/empresas";
 
 const RUNNER_NAME = "NEXUS Queue Runner";
 
@@ -46,19 +47,32 @@ export async function runNext(opts: { mode?: string } = {}): Promise<RunResult> 
   // Reclamar
   await setAgentState(issue.number, "agent-working");
 
-  // Resolver fuentes de datos declaradas en el issue (@source: ...)
+  // Resolver fuentes: las de la empresa del issue (label empresa:<id>) + las declaradas en el cuerpo (@source:).
   let sourcesContext = "";
   let sourcesNote = "";
   try {
-    const { context, results } = await resolveSources(issue.body);
+    const empresaLabel = issue.labels.find((l) => l.startsWith("empresa:"));
+    let combinedBody = issue.body;
+    let empresaNote = "";
+    if (empresaLabel) {
+      const empresa = await getEmpresa(empresaLabel.slice("empresa:".length));
+      if (empresa && empresa.sources.length) {
+        combinedBody = `${empresaSourcesBody(empresa)}\n${issue.body}`;
+        empresaNote = `Empresa: ${empresa.nombre}. `;
+      }
+    }
+    const { context, results } = await resolveSources(combinedBody);
     if (results.length) {
       sourcesContext = context;
       const ok = results.filter((r) => r.ok).map((r) => r.label);
       const bad = results.filter((r) => !r.ok).map((r) => `${r.label}: ${r.error}`);
       sourcesNote = [
+        empresaNote,
         ok.length ? `Fuentes consultadas: ${ok.join(", ")}.` : "",
         bad.length ? `Fuentes con error: ${bad.join(" · ")}.` : "",
       ].filter(Boolean).join(" ");
+    } else {
+      sourcesNote = empresaNote;
     }
   } catch (e) {
     sourcesNote = `Aviso: fallo resolviendo fuentes (${e instanceof Error ? e.message : String(e)}).`;

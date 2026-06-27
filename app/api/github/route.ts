@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
           body: payload.body || "",
           extraLabels: Array.isArray(payload.labels) ? payload.labels : undefined,
           assignee: DEFAULT_ASSIGNEE,
+          empresaId: payload.empresa || undefined,
         });
         return NextResponse.json({ issue });
       }

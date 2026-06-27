@@ -228,12 +228,25 @@ const GESTIVO_BASE = process.env.GESTIVO_API_URL || "https://saas-six-vert.verce
 
 interface GestivoFilter { column: string; op: string; value: string }
 
+function parseWhere(rest: string): GestivoFilter[] {
+  const filters: GestivoFilter[] = [];
+  const re = /where=(\S+)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(rest)) !== null) {
+    const parts = m[1].split(":");
+    if (parts.length >= 3) filters.push({ column: parts[0], op: parts[1], value: parts.slice(2).join(":") });
+  }
+  return filters;
+}
+
 /**
- * Conector de la Data API GESTIVO.
- *   @source: gestivo schema=true
- *   @source: gestivo resource=conductores_con_grupo where=estado:eq:ACTIVO limit=20
- *   @source: gestivo resource=cierres_diarios where=fecha:gte:2026-06-01 order=fecha limit=50
- * Admite varios filtros repitiendo where=columna:operador:valor.
+ * Conector de la Data API GESTIVO (3 operaciones).
+ *   Esquema:   @source: gestivo schema=true
+ *   Consulta:  @source: gestivo resource=conductores_con_grupo where=estado:eq:ACTIVO limit=50
+ *              (pagina con pages=N para recorrer varias páginas de 1000)
+ *   Agregar:   @source: gestivo resource=viajes_perdidos agg=count group=conductor_nombre limit=10
+ *              (para "quién tiene más", "cuántos por X"; agg=count|sum|avg|min|max, metric=<col> si sum/avg)
+ * Filtros: where=columna:operador:valor (repetible). Operadores: eq neq gt gte lt lte like ilike in is.
  */
 async function fetchGestivoSource(d: SourceDirective): Promise<SourceResult> {
   const type = "gestivo";
@@ -242,7 +255,7 @@ async function fetchGestivoSource(d: SourceDirective): Promise<SourceResult> {
     if (!key) throw new Error("Configura GESTIVO_API_KEY en .env.local");
     const headers = { "x-api-key": key, "Content-Type": "application/json" };
 
-    // Esquema: lista de recursos y columnas disponibles.
+    // 1) Esquema
     if (d.args.schema || (!d.args.resource && /\bschema\b/i.test(d.rest))) {
       const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/schema`, { headers, signal: AbortSignal.timeout(20_000) });
       const text = await resp.text();
@@ -252,27 +265,48 @@ async function fetchGestivoSource(d: SourceDirective): Promise<SourceResult> {
 
     const resource = d.args.resource;
     if (!resource) throw new Error("Falta resource= (ej: @source: gestivo resource=conductores_con_grupo) o usa schema=true");
+    const filters = parseWhere(d.rest);
 
-    // Filtros: where=columna:operador:valor (admite varios).
-    const filters: GestivoFilter[] = [];
-    const re = /where=(\S+)/g;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(d.rest)) !== null) {
-      const parts = m[1].split(":");
-      if (parts.length >= 3) filters.push({ column: parts[0], op: parts[1], value: parts.slice(2).join(":") });
+    // 3) Agregación (quién tiene más / cuántos por X / totales / promedios)
+    if (d.args.agg) {
+      const body: Record<string, unknown> = {
+        resource,
+        group_by: (d.args.group || "").split(",").map((s) => s.trim()).filter(Boolean),
+        agg: d.args.agg,
+        filters,
+        limit: Number(d.args.limit || 20),
+      };
+      if (d.args.metric) body.metric = d.args.metric;
+      const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/aggregate`, { method: "POST", headers, body: JSON.stringify(body), signal: AbortSignal.timeout(30_000) });
+      const text = await resp.text();
+      if (!resp.ok) throw new Error(`GESTIVO aggregate ${resp.status}: ${text.slice(0, 300)}`);
+      const json = JSON.parse(text) as { data?: unknown[]; groups?: unknown[] };
+      const groups = json.data ?? json.groups ?? json;
+      const content = trim(`Agregación de ${resource} (${d.args.agg}${d.args.metric ? ` de ${d.args.metric}` : ""} por ${d.args.group}) sobre TODAS las filas${filters.length ? ` (filtros: ${filters.map((f) => `${f.column} ${f.op} ${f.value}`).join(", ")})` : ""}:\n\n${JSON.stringify(groups, null, 2)}`);
+      return { type, label: `GESTIVO agg: ${resource} por ${d.args.group}`, ok: true, content };
     }
 
-    const body: Record<string, unknown> = { resource, filters, limit: Number(d.args.limit || 50) };
-    if (d.args.order) body.order = d.args.order;
-
-    const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/query`, { method: "POST", headers, body: JSON.stringify(body), signal: AbortSignal.timeout(30_000) });
-    const text = await resp.text();
-    if (!resp.ok) throw new Error(`GESTIVO ${resp.status}: ${text.slice(0, 300)}`);
-    const json = JSON.parse(text) as { data?: unknown[]; count?: number; total?: number };
-    const rows = json.data ?? (json as unknown[]);
-    const n = json.count ?? (Array.isArray(rows) ? rows.length : 0);
-    const content = trim(`Recurso ${resource} — ${n} de ${json.total ?? "?"} filas${filters.length ? ` (filtros: ${filters.map((f) => `${f.column} ${f.op} ${f.value}`).join(", ")})` : ""}:\n\n${JSON.stringify(rows, null, 2)}`);
-    return { type, label: `GESTIVO: ${resource} (${n}/${json.total ?? "?"})`, ok: true, content };
+    // 2) Consulta (con paginación opcional usando offset/nextOffset)
+    const maxPages = Math.min(Number(d.args.pages || 1), 20);
+    const pageLimit = Number(d.args.limit || 50);
+    let offset = 0;
+    let total: number | undefined;
+    const rows: unknown[] = [];
+    for (let page = 0; page < maxPages; page++) {
+      const body: Record<string, unknown> = { resource, filters, limit: pageLimit, offset };
+      if (d.args.order) body.order = d.args.order;
+      const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/query`, { method: "POST", headers, body: JSON.stringify(body), signal: AbortSignal.timeout(30_000) });
+      const text = await resp.text();
+      if (!resp.ok) throw new Error(`GESTIVO ${resp.status}: ${text.slice(0, 300)}`);
+      const json = JSON.parse(text) as { data?: unknown[]; total?: number; nextOffset?: number | null };
+      const pageRows = json.data ?? [];
+      rows.push(...pageRows);
+      total = json.total ?? total;
+      if (json.nextOffset === null || json.nextOffset === undefined || pageRows.length === 0) break;
+      offset = json.nextOffset;
+    }
+    const content = trim(`Recurso ${resource} — ${rows.length} filas de ${total ?? "?"}${filters.length ? ` (filtros: ${filters.map((f) => `${f.column} ${f.op} ${f.value}`).join(", ")})` : ""}:\n\n${JSON.stringify(rows, null, 2)}`);
+    return { type, label: `GESTIVO: ${resource} (${rows.length}/${total ?? "?"})`, ok: true, content };
   } catch (e) {
     return { type, label: "GESTIVO", ok: false, content: "", error: e instanceof Error ? e.message : String(e) };
   }

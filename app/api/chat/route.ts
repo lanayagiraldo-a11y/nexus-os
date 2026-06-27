@@ -2,12 +2,28 @@ import { NextRequest } from "next/server";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getHermesApiKey, getHermesBaseUrl, getHermesModel, getHermesSessionKey } from "@/lib/nexusConfig";
+import { getEmpresa, empresaSourcesBody } from "@/lib/empresas";
+import { resolveSources } from "@/lib/sources";
 
 export const runtime = "nodejs";
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+}
+
+/** Contexto de las fuentes de UNA empresa (aislado). Vacío si no hay empresa o no tiene fuentes. */
+async function buildEmpresaContext(empresaId: string): Promise<string> {
+  const empresa = await getEmpresa(empresaId);
+  if (!empresa || !empresa.sources.length) return "";
+  const { context } = await resolveSources(empresaSourcesBody(empresa));
+  if (!context) return "";
+  return [
+    `## EMPRESA SELECCIONADA: ${empresa.nombre}`,
+    "Responde SOLO con datos de esta empresa. No mezcles información de otras empresas.",
+    "",
+    context,
+  ].join("\n");
 }
 
 function sseStream(fn: (controller: ReadableStreamDefaultController) => Promise<void>): Response {
@@ -229,6 +245,18 @@ export async function POST(req: NextRequest) {
   const { provider } = payload;
   const messages = normalizeMessages(payload);
   if (!messages.length) return Response.json({ error: "Missing message" }, { status: 400 });
+
+  // Si hay empresa seleccionada, anteponer SOLO sus fuentes al último mensaje del usuario.
+  if (payload.empresa) {
+    try {
+      const ctx = await buildEmpresaContext(String(payload.empresa));
+      if (ctx) {
+        const i = messages.length - 1;
+        messages[i] = { ...messages[i], content: `${messages[i].content}\n\n---\n${ctx}` };
+      }
+    } catch { /* si falla el contexto, sigue sin él */ }
+  }
+
   switch (provider) {
     case "claude": return streamClaude(messages);
     case "openai": return streamOpenAI(messages);

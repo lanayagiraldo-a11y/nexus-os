@@ -44,7 +44,7 @@ function token(): string {
   return t;
 }
 
-async function gh<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+export async function gh<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
   const resp = await fetch(`${API}${path}`, {
     ...init,
     headers: {
@@ -138,8 +138,10 @@ export async function createPeticion(opts: {
   body?: string;
   extraLabels?: string[];
   assignee?: string;
+  empresaId?: string;
 }): Promise<QueueIssue> {
-  const labels = Array.from(new Set(["agent-todo", ...(opts.extraLabels ?? [])]));
+  const empresaLabel = opts.empresaId ? [`empresa:${opts.empresaId}`] : [];
+  const labels = Array.from(new Set(["agent-todo", ...empresaLabel, ...(opts.extraLabels ?? [])]));
   const issue = await gh<RawIssue>(`/repos/${REPO}/issues`, {
     method: "POST",
     body: JSON.stringify({
