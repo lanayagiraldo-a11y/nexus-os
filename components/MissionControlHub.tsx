@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AgentAvatar from "./AgentAvatar";
-import OrchestratorView from "./OrchestratorView";
+import ConsejoSimple from "./ConsejoSimple";
 
 // Colors
 const PURPLE = "#4C1D95";
@@ -308,7 +308,7 @@ export default function MissionControlHub() {
 
           {activeTab === "consejo" && (
             <motion.div key="consejo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-hidden">
-              <OrchestratorView />
+              <ConsejoSimple />
             </motion.div>
           )}
 
