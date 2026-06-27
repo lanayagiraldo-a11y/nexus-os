@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AgentAvatar from "./AgentAvatar";
+import OrchestratorView from "./OrchestratorView";
 
 // Colors
 const PURPLE = "#4C1D95";
@@ -9,7 +10,7 @@ const PARCHMENT = "#F7EFE2";
 const INK = "#07182E";
 const EMERALD = "#047857";
 
-type TabId = "chat" | "workflow";
+type TabId = "chat" | "consejo" | "workflow";
 
 interface Message {
   id: number;
@@ -203,6 +204,7 @@ export default function MissionControlHub() {
       <div className="flex gap-1 px-5 pt-3 flex-shrink-0 border-b" style={{ borderColor: "rgba(76,29,149,0.06)" }}>
         {[
           { id: "chat" as TabId, label: "💬 Chat", count: messages.filter(m => m.role === "agent").length },
+          { id: "consejo" as TabId, label: "🧠 Consejo" },
           { id: "workflow" as TabId, label: "🔀 Workflow", count: workflows.length },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
@@ -301,6 +303,12 @@ export default function MissionControlHub() {
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-lg cursor-pointer border-none flex-shrink-0"
                   style={{ background: PURPLE, color: PARCHMENT }}>➤</button>
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "consejo" && (
+            <motion.div key="consejo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-hidden">
+              <OrchestratorView />
             </motion.div>
           )}
 
