@@ -21,6 +21,7 @@ interface Message {
   time: string;
   extra?: "perplexity" | "image" | "audio" | "pdf";
   extraLabel?: string;
+  fileUrl?: string;
   loading?: boolean;
 }
 
@@ -118,7 +119,7 @@ export default function MissionControlHub() {
 
     try {
       const lower = text.toLowerCase();
-      let result: { content: string; extra?: string; extraLabel?: string; agentLabel?: string } | null = null;
+      let result: { content: string; extra?: string; extraLabel?: string; fileUrl?: string; agentLabel?: string } | null = null;
 
       // Detect intent: investigation/research
       if (/investiga|busca|competidores|investigación|research|análisis de mercado|precios/i.test(lower)) {
@@ -168,6 +169,8 @@ export default function MissionControlHub() {
           result = {
             content: "Audio generado:",
             extra: "audio",
+            extraLabel: "audio-mensaje.mp3",
+            fileUrl: data.audio,
             agentLabel: "🎤 Hermes vía ElevenLabs",
           };
         } else throw new Error(data.error || "Error en audio");
@@ -187,6 +190,7 @@ export default function MissionControlHub() {
         text: result?.content || "Listo",
         extra: result?.extra as any,
         extraLabel: result?.extraLabel,
+        fileUrl: result?.fileUrl,
         agentLabel: result?.agentLabel || "⚡ Hermes",
         loading: false,
       } : m));
@@ -297,18 +301,26 @@ export default function MissionControlHub() {
                         <div className="mt-2 rounded-lg p-3" style={{ background: "rgba(247,239,226,0.7)", border: "1px solid rgba(76,29,149,0.08)" }}>
                           <div className="flex items-center gap-2 text-xs">
                             <span className="text-lg">🔊</span>
-                            <span style={{ color: "rgba(31,41,55,0.5)" }}>la-carolina-bienvenida.mp3</span>
-                            <span className="ml-auto px-3 py-1 rounded text-2xs font-bold" style={{ background: "rgba(76,29,149,0.06)", color: PURPLE }}>▶ Reproducir</span>
+                            <span style={{ color: "rgba(31,41,55,0.5)" }}>{msg.extraLabel || "audio.mp3"}</span>
+                            {msg.fileUrl ? (
+                              <audio controls className="ml-auto h-8 max-w-[140px]" src={msg.fileUrl}>Tu navegador no soporta audio</audio>
+                            ) : (
+                              <span className="ml-auto px-3 py-1 rounded text-2xs font-bold" style={{ background: "rgba(76,29,149,0.06)", color: PURPLE }}>▶ Reproducir</span>
+                            )}
                           </div>
                         </div>
                       )}
 
                       {msg.extra === "pdf" && (
-                        <div className="mt-2 rounded-lg p-3" style={{ background: "rgba(247,239,226,0.7)", border: "1px solid rgba(76,29,149,0.08)" }}>
+                        <div className="mt-2 rounded-lg p-3" style={{ background: "rgba(247,239,226,0.7)", border: "1px solid rgba(4,120,87,0.12)" }}>
                           <div className="flex items-center gap-2 text-xs">
                             <span className="text-lg">📄</span>
-                            <span style={{ color: INK, fontWeight: 500 }}>{msg.extraLabel || "documento.pdf"}</span>
-                            <span className="ml-auto px-3 py-1 rounded text-2xs font-bold" style={{ background: "rgba(4,120,87,0.06)", color: EMERALD }}>⬇ Descargar</span>
+                            <span style={{ color: "rgba(31,41,55,0.5)" }}>{msg.extraLabel || "documento.pdf"}</span>
+                            {msg.fileUrl ? (
+                              <a href={msg.fileUrl} download={msg.extraLabel || "documento.pdf"} className="ml-auto px-3 py-1 rounded text-2xs font-bold no-underline" style={{ background: EMERALD, color: PARCHMENT }}>⬇ Descargar</a>
+                            ) : (
+                              <span className="ml-auto px-3 py-1 rounded text-2xs font-bold" style={{ background: "rgba(4,120,87,0.1)", color: EMERALD }}>✅ Descargar</span>
+                            )}
                           </div>
                         </div>
                       )}
