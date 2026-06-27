@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
           supabase: Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY)),
           apify: Boolean(process.env.APIFY_TOKEN),
           sharepoint: Boolean(process.env.MS_TENANT_ID && process.env.MS_CLIENT_ID && process.env.MS_CLIENT_SECRET),
+          gestivo: Boolean(process.env.GESTIVO_API_KEY),
           url: true,
         },
       });

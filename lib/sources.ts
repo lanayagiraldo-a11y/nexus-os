@@ -222,6 +222,62 @@ async function fetchSharepointSource(args: Record<string, string>): Promise<Sour
   }
 }
 
+// ---------- GESTIVO (Data API propia de solo lectura) ----------
+
+const GESTIVO_BASE = process.env.GESTIVO_API_URL || "https://saas-six-vert.vercel.app";
+
+interface GestivoFilter { column: string; op: string; value: string }
+
+/**
+ * Conector de la Data API GESTIVO.
+ *   @source: gestivo schema=true
+ *   @source: gestivo resource=conductores_con_grupo where=estado:eq:ACTIVO limit=20
+ *   @source: gestivo resource=cierres_diarios where=fecha:gte:2026-06-01 order=fecha limit=50
+ * Admite varios filtros repitiendo where=columna:operador:valor.
+ */
+async function fetchGestivoSource(d: SourceDirective): Promise<SourceResult> {
+  const type = "gestivo";
+  const key = process.env.GESTIVO_API_KEY;
+  try {
+    if (!key) throw new Error("Configura GESTIVO_API_KEY en .env.local");
+    const headers = { "x-api-key": key, "Content-Type": "application/json" };
+
+    // Esquema: lista de recursos y columnas disponibles.
+    if (d.args.schema || (!d.args.resource && /\bschema\b/i.test(d.rest))) {
+      const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/schema`, { headers, signal: AbortSignal.timeout(20_000) });
+      const text = await resp.text();
+      if (!resp.ok) throw new Error(`GESTIVO schema ${resp.status}: ${text.slice(0, 300)}`);
+      return { type, label: "GESTIVO: esquema", ok: true, content: trim(text) };
+    }
+
+    const resource = d.args.resource;
+    if (!resource) throw new Error("Falta resource= (ej: @source: gestivo resource=conductores_con_grupo) o usa schema=true");
+
+    // Filtros: where=columna:operador:valor (admite varios).
+    const filters: GestivoFilter[] = [];
+    const re = /where=(\S+)/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(d.rest)) !== null) {
+      const parts = m[1].split(":");
+      if (parts.length >= 3) filters.push({ column: parts[0], op: parts[1], value: parts.slice(2).join(":") });
+    }
+
+    const body: Record<string, unknown> = { resource, filters, limit: Number(d.args.limit || 50) };
+    if (d.args.order) body.order = d.args.order;
+
+    const resp = await fetch(`${GESTIVO_BASE}/api/external/v1/query`, { method: "POST", headers, body: JSON.stringify(body), signal: AbortSignal.timeout(30_000) });
+    const text = await resp.text();
+    if (!resp.ok) throw new Error(`GESTIVO ${resp.status}: ${text.slice(0, 300)}`);
+    const json = JSON.parse(text) as { data?: unknown[]; count?: number; total?: number };
+    const rows = json.data ?? (json as unknown[]);
+    const n = json.count ?? (Array.isArray(rows) ? rows.length : 0);
+    const content = trim(`Recurso ${resource} — ${n} de ${json.total ?? "?"} filas${filters.length ? ` (filtros: ${filters.map((f) => `${f.column} ${f.op} ${f.value}`).join(", ")})` : ""}:\n\n${JSON.stringify(rows, null, 2)}`);
+    return { type, label: `GESTIVO: ${resource} (${n}/${json.total ?? "?"})`, ok: true, content };
+  } catch (e) {
+    return { type, label: "GESTIVO", ok: false, content: "", error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 // ---------- Resolución ----------
 
 export async function resolveOneSource(d: SourceDirective): Promise<SourceResult> {
@@ -230,7 +286,8 @@ export async function resolveOneSource(d: SourceDirective): Promise<SourceResult
     case "supabase": case "postgres": return fetchSupabaseSource(d.args);
     case "apify": return fetchApifySource(d.args);
     case "sharepoint": case "excel": return fetchSharepointSource(d.args);
-    default: return { type: d.type, label: d.type, ok: false, content: "", error: `Fuente desconocida: ${d.type}. Usa url, supabase, apify o sharepoint.` };
+    case "gestivo": case "api": return fetchGestivoSource(d);
+    default: return { type: d.type, label: d.type, ok: false, content: "", error: `Fuente desconocida: ${d.type}. Usa url, supabase, apify, sharepoint o gestivo.` };
   }
 }
 
