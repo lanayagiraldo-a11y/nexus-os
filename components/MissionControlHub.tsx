@@ -169,8 +169,8 @@ export default function MissionControlHub() {
           result = {
             content: "Audio generado:",
             extra: "audio",
-            extraLabel: "audio-mensaje.mp3",
-            fileUrl: data.audio,
+            extraLabel: data.fileName || "audio-mensaje.mp3",
+            fileUrl: data.url,
             agentLabel: "🎤 Hermes vía ElevenLabs",
           };
         } else throw new Error(data.error || "Error en audio");

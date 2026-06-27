@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,10 +32,15 @@ export async function POST(req: NextRequest) {
     }
 
     const audioBuffer = await resp.arrayBuffer();
-    const base64 = Buffer.from(audioBuffer).toString("base64");
+    const fileName = `audio-${Date.now()}.mp3`;
+    const publicDir = path.join(process.cwd(), "public", "downloads");
+    await fs.mkdir(publicDir, { recursive: true });
+    const filePath = path.join(publicDir, fileName);
+    await fs.writeFile(filePath, Buffer.from(audioBuffer));
 
     return NextResponse.json({
-      audio: `data:audio/mpeg;base64,${base64}`,
+      url: `/downloads/${fileName}`,
+      fileName,
       format: "mp3",
     });
   } catch (err) {
