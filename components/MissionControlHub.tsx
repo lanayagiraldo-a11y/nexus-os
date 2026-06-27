@@ -221,7 +221,7 @@ export default function MissionControlHub() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: PARCHMENT }}>
       {/* Agent Status Bar */}
-      <div className="flex gap-2 px-5 py-3 overflow-x-auto flex-shrink-0 border-b items-center" style={{ borderColor: "rgba(76,29,149,0.06)" }}>
+      <div className="flex gap-2 px-5 py-3 overflow-x-auto flex-shrink-0 border-b" style={{ borderColor: "rgba(76,29,149,0.06)" }}>
         {AGENTS.map(a => (
           <div key={a.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap"
             style={{ background: statusBg(a.status), border: `1px solid ${a.status === "Inactivo" ? "rgba(31,41,55,0.06)" : `${a.color}20`}` }}>
@@ -230,11 +230,6 @@ export default function MissionControlHub() {
             <span style={{ color: "rgba(31,41,55,0.4)" }}>{a.status}</span>
           </div>
         ))}
-        <a href="https://hermi.liliana-anaya.com/chat/new" target="_blank" rel="noopener noreferrer"
-           className="ml-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap no-underline"
-           style={{ background: PURPLE, color: PARCHMENT }}>
-          🤖 Hermes Agent →
-        </a>
       </div>
 
       {/* Tabs */}

@@ -111,6 +111,13 @@ export default function Sidebar({activeView,onViewChange}:SidebarProps) {
           <div><div className="text-sm font-black tracking-[0.12em]" style={{fontFamily:"var(--font-syne)",color:"#FFFFFF"}}>NEXUS</div><div className="text-[10px] uppercase tracking-[0.16em] font-semibold" style={{fontFamily:"var(--font-jetbrains)",color:"rgba(255,255,255,0.72)"}}>v2.1.0 · CORE ACTIVE</div></div>
         </div>
         <SidebarContent activeView={activeView} onNavigate={navigate} />
+        <div className="mt-auto p-3">
+          <a href="https://hermi.liliana-anaya.com/chat/new" target="_blank" rel="noopener noreferrer"
+             className="flex items-center justify-center gap-2 w-full px-5 py-3 rounded-xl text-sm font-black no-underline transition-all"
+             style={{ background: "linear-gradient(135deg, #7C3AED, #4C1D95)", color: "#FFFFFF", boxShadow: "0 4px 20px rgba(124,58,237,0.3)" }}>
+            🤖 Hermes Agent →
+          </a>
+        </div>
       </motion.aside>
 
       <button type="button" aria-label="Abrir barra izquierda" onClick={()=>setMobileOpen(true)} className="md:hidden fixed left-3 top-[70px] z-50 flex items-center gap-2 rounded-full px-4 py-2.5 shadow-lg" style={{background:"rgba(40,24,54,0.96)",border:"1px solid rgba(255,255,255,0.18)",color:"#FFFFFF",fontFamily:"var(--font-outfit)",backdropFilter:"blur(14px)"}}>
