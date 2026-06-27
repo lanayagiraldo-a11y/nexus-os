@@ -9,8 +9,20 @@ interface QueueIssue {
   title: string;
   url: string;
   agentState: string | null;
+  agent: string | null;
   labels: string[];
 }
+
+const AGENT_META: Record<string, { icon: string; color: string; nombre: string }> = {
+  hermes: { icon: "🪶", color: "#7C3AED", nombre: "Hermes" },
+  claude: { icon: "🔮", color: "#D18449", nombre: "Claude" },
+  openai: { icon: "⚡", color: "#10A37F", nombre: "ChatGPT" },
+  gemini: { icon: "✨", color: "#2563EB", nombre: "Gemini" },
+  codex: { icon: "🤖", color: "#00A676", nombre: "Codex" },
+  perplexity: { icon: "🔍", color: "#00A676", nombre: "Perplexity" },
+  manus: { icon: "🧩", color: "#6B7280", nombre: "Manus" },
+  deepseek: { icon: "🐋", color: "#4D6BFE", nombre: "DeepSeek" },
+};
 
 const COLUMNS: { state: string; label: string; color: string }[] = [
   { state: "agent-todo", label: "📥 Todo", color: "#6B7280" },
@@ -123,11 +135,22 @@ export default function QueuePanel() {
                 <span className="px-1.5 rounded" style={{ background: col.color, color: "#fff" }}>{items.length}</span>
               </div>
               <div className="flex flex-col gap-2">
-                {items.map((i) => (
+                {items.map((i) => {
+                  const meta = i.agent ? AGENT_META[i.agent] : null;
+                  const working = col.state === "agent-working";
+                  return (
                   <div key={i.number} className="rounded-lg p-2 text-xs" style={{ background: "#fff", border: "1px solid rgba(31,41,55,0.08)" }}>
                     <a href={i.url} target="_blank" rel="noreferrer" className="font-semibold block mb-1 hover:underline" style={{ color: INK }}>
                       #{i.number} {i.title.replace(/\[.*?\]/g, "").trim().slice(0, 60)}
                     </a>
+                    {/* Agente a cargo de la acción */}
+                    {meta && (
+                      <div className="flex items-center gap-1 mb-1 px-1.5 py-0.5 rounded w-fit" style={{ background: `${meta.color}14`, color: meta.color }}>
+                        {working && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: meta.color }} />}
+                        <span style={{ fontWeight: 700 }}>{meta.icon} {meta.nombre}</span>
+                        <span style={{ opacity: 0.7 }}>{working ? "trabajando…" : col.state === "agent-review" ? "terminó" : ""}</span>
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-1">
                       {col.state === "agent-todo" && (
                         <button onClick={() => act(i.number, "run-next")} disabled={!!busy} className="px-1.5 py-0.5 rounded text-white" style={{ background: PURPLE }}>▶ run</button>
@@ -140,7 +163,8 @@ export default function QueuePanel() {
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 {!items.length && <div className="text-xs opacity-30 py-1" style={{ color: INK }}>—</div>}
               </div>
             </div>

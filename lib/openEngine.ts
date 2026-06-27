@@ -86,6 +86,7 @@ export interface QueueIssue {
   url: string;
   state: string;
   agentState: AgentState | null;
+  agent: string | null;
   labels: string[];
   assignee: string | null;
   createdAt: string;
@@ -95,6 +96,10 @@ export interface QueueIssue {
 function mapIssue(i: RawIssue): QueueIssue {
   const labels = i.labels.map((l) => l.name);
   const agentState = (AGENT_STATES.find((s) => labels.includes(s)) as AgentState) ?? null;
+  // Agente a cargo: etiqueta by:<agente> (la pone el runner) o, si no, el patrón [agente] del título.
+  const byLabel = labels.find((l) => l.startsWith("by:"));
+  const titleMatch = i.title.match(/\[(hermes|claude|codex|gemini|openai|deepseek|perplexity|manus)\]/i);
+  const agent = byLabel ? byLabel.slice(3) : (titleMatch ? titleMatch[1].toLowerCase() : null);
   return {
     number: i.number,
     title: i.title,
@@ -102,6 +107,7 @@ function mapIssue(i: RawIssue): QueueIssue {
     url: i.html_url,
     state: i.state,
     agentState,
+    agent,
     labels,
     assignee: i.assignee?.login ?? null,
     createdAt: i.created_at,
@@ -166,6 +172,16 @@ export async function setAgentState(number: number, to: AgentState): Promise<Que
   // El endpoint de labels devuelve el array de labels, no el issue; releemos para devolver el issue completo.
   void updated;
   return getIssue(number);
+}
+
+/** Marca qué agente está a cargo del issue con la etiqueta by:<agente> (reemplaza la anterior). */
+export async function setAgentBy(number: number, agent: string): Promise<void> {
+  const issue = await getIssue(number);
+  const kept = issue.labels.filter((l) => !l.startsWith("by:"));
+  await gh(`/repos/${REPO}/issues/${number}/labels`, {
+    method: "PUT",
+    body: JSON.stringify({ labels: [...kept, `by:${agent}`] }),
+  });
 }
 
 export type ReceiptKind = "CLAIMED" | "DONE" | "BLOCKED" | "NEEDS-INPUT" | "NOTE";

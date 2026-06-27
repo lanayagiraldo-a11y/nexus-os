@@ -6,7 +6,7 @@
  * deja recibo DONE con el resultado y lo pasa a `agent-review`. Si algo falla,
  * deja recibo BLOCKED y lo pasa a `agent-blocked`.
  */
-import { addReceipt, getIssue, listQueue, setAgentState, type QueueIssue } from "@/lib/openEngine";
+import { addReceipt, getIssue, listQueue, setAgentState, setAgentBy, type QueueIssue } from "@/lib/openEngine";
 import { orchestrateMission } from "@/lib/orchestrator";
 import { PROVIDERS, type ProviderId } from "@/lib/providers";
 import { resolveSources } from "@/lib/sources";
@@ -46,6 +46,7 @@ export async function runNext(opts: { mode?: string } = {}): Promise<RunResult> 
 
   // Reclamar
   await setAgentState(issue.number, "agent-working");
+  await setAgentBy(issue.number, agents[0]); // agente principal a cargo
 
   // Resolver fuentes: las de la empresa del issue (label empresa:<id>) + las declaradas en el cuerpo (@source:).
   let sourcesContext = "";

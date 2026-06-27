@@ -60,55 +60,6 @@ export default function MissionControlHub() {
   ]);
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const [agentCounts] = useState({ active: 4, total: 7 });
-
-  // Workflow state
-  const [workflows, setWorkflows] = useState([
-    { title: "📋 Análisis competidores Taqwa Team", steps: [
-      { num: 1, agent: "Perplexity", desc: "Investigación con fuentes", status: "done" },
-      { num: 2, agent: "Hermes", desc: "Consolidar PDF final", status: "working" },
-    ]},
-  ]);
-  const [loadingIssues, setLoadingIssues] = useState(false);
-
-  // Fetch real issues from ia-masters-os
-  useEffect(() => {
-    const fetchIssues = async () => {
-      if (activeTab !== "workflow") return;
-      setLoadingIssues(true);
-      try {
-        const resp = await fetch("/api/github", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "list-issues" }),
-        });
-        const data = await resp.json();
-        if (data.issues && data.issues.length > 0) {
-          const grouped = data.issues.reduce((acc: any[], issue: any) => {
-            const label = issue.labels.find((l: string) => ["agent-todo","agent-working","agent-review","agent-done"].includes(l)) || "agent-todo";
-            const status = label === "agent-done" ? "done" : "working";
-            const agentName = issue.title.match(/\[(hermes|claude|codex|gemini|deepseek|perplexity|manus)\]/i);
-            const agent = agentName ? agentName[1].charAt(0).toUpperCase() + agentName[1].slice(1) : "Hermes";
-            if (!acc.length || acc[acc.length-1].steps.some((s: any) => s.status !== "done")) {
-              acc.push({ title: `📋 #${issue.number} ${issue.title.replace(/\[.*?\]/g, '').trim().slice(0, 50)}`, steps: [] });
-            }
-            const last = acc[acc.length-1];
-            last.steps.push({ num: last.steps.length + 1, agent, desc: issue.title.slice(0, 60), status });
-            return acc;
-          }, []);
-          if (grouped.length > 0) setWorkflows(grouped.slice(0, 5));
-        }
-      } catch (e) {
-        console.error("Failed to fetch issues:", e);
-      } finally {
-        setLoadingIssues(false);
-      }
-    };
-    fetchIssues();
-    const interval = setInterval(fetchIssues, 30000);
-    return () => clearInterval(interval);
-  }, [activeTab]);
-
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   const handleSend = async () => {
@@ -232,16 +183,17 @@ export default function MissionControlHub() {
       setMessages(prev => prev.map(m => m.id === loadingId ? {
         ...m,
         text: result?.content || "Listo",
-        extra: result?.extra as any,
+        extra: result?.extra as Message["extra"],
         extraLabel: result?.extraLabel,
         fileUrl: result?.fileUrl,
         agentLabel: result?.agentLabel || "⚡ Hermes",
         loading: false,
       } : m));
 
-    } catch (err: any) {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       setMessages(prev => prev.map(m => m.id === loadingId ? {
-        ...m, text: `Error: ${err.message}`, loading: false,
+        ...m, text: `Error: ${msg}`, loading: false,
       } : m));
     }
   };
@@ -281,7 +233,6 @@ export default function MissionControlHub() {
         {[
           { id: "chat" as TabId, label: "💬 Chat", count: messages.filter(m => m.role === "agent").length },
           { id: "consejo" as TabId, label: "🧠 Consejo" },
-          { id: "workflow" as TabId, label: "🔀 Workflow", count: workflows.length },
           { id: "cola" as TabId, label: "🗂️ Cola" },
           { id: "empresas" as TabId, label: "🏢 Empresas" },
         ].map(tab => (
@@ -406,42 +357,6 @@ export default function MissionControlHub() {
           {activeTab === "consejo" && (
             <motion.div key="consejo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-hidden">
               <ConsejoSimple />
-            </motion.div>
-          )}
-
-          {activeTab === "workflow" && (
-            <motion.div key="workflow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-y-auto p-4 space-y-3">
-              {workflows.map((wf, i) => (
-                <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(247,239,226,0.92)", border: "1px solid rgba(76,29,149,0.06)" }}>
-                  <div className="text-sm font-bold mb-2.5 flex items-center gap-2" style={{ color: INK, fontFamily: "'Syne', sans-serif" }}>
-                    <span>{wf.title}</span>
-                  </div>
-                  <div className="flex flex-col gap-0">
-                    {wf.steps.map((step, j) => {
-                      const iconBg = step.status === "done" ? EMERALD : step.status === "working" ? "#D97706" : "rgba(31,41,55,0.06)";
-                      const iconColor = step.status !== "pending" ? "#fff" : "rgba(31,41,55,0.3)";
-                      const iconContent = step.status === "done" ? "✓" : step.status === "working" ? "↻" : String(step.num);
-                      return (
-                        <div key={j} className="flex items-start gap-3 py-2">
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                            style={{ background: iconBg, color: iconColor }}>
-                            {iconContent}
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-xs font-semibold" style={{ color: PURPLE }}>{step.agent}</div>
-                            <div className="text-sm" style={{ color: INK }}>{step.desc}</div>
-                            <div className="text-xs font-medium mt-0.5" style={{
-                              color: step.status === "done" ? EMERALD : step.status === "working" ? "#D97706" : "rgba(31,41,55,0.35)"
-                            }}>
-                              {step.status === "done" ? "✅ Listo" : step.status === "working" ? "🔄 Trabajando" : "⏳ Pendiente"}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
             </motion.div>
           )}
 
