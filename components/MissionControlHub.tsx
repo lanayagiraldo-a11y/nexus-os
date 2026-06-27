@@ -316,24 +316,33 @@ export default function MissionControlHub() {
             <motion.div key="workflow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 overflow-y-auto p-4 space-y-3">
               {workflows.map((wf, i) => (
                 <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(247,239,226,0.92)", border: "1px solid rgba(76,29,149,0.06)" }}>
-                  <div className="text-sm font-bold mb-2.5" style={{ color: INK, fontFamily: "'Syne', sans-serif" }}>{wf.title}</div>
-                  {wf.steps.map((step, j) => (
-                    <div key={j} className="flex items-start gap-2.5 py-1.5">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-2xs font-bold flex-shrink-0"
-                        style={{
-                          background: step.status === "done" ? EMERALD : step.status === "working" ? "#D97706" : "rgba(31,41,55,0.06)",
-                          color: step.status !== "pending" ? "#fff" : "rgba(31,41,55,0.3)",
-                          border: step.status === "pending" ? "1px solid rgba(31,41,55,0.1)" : "none",
-                        }}>{step.num}</div>
-                      <div className="flex-1">
-                        <div className="text-2xs font-semibold" style={{ color: PURPLE }}>{step.agent}</div>
-                        <div className="text-xs" style={{ color: INK }}>{step.desc}</div>
-                        <div className="text-2xs" style={{
-                          color: step.status === "done" ? EMERALD : step.status === "working" ? "#D97706" : "rgba(31,41,55,0.3)"
-                        }}>{step.status === "done" ? "✅ Completado" : step.status === "working" ? "🔄 Trabajando" : "⏳ Pendiente"}</div>
-                      </div>
-                    </div>
-                  ))}
+                  <div className="text-sm font-bold mb-2.5 flex items-center gap-2" style={{ color: INK, fontFamily: "'Syne', sans-serif" }}>
+                    <span>{wf.title}</span>
+                  </div>
+                  <div className="flex flex-col gap-0">
+                    {wf.steps.map((step, j) => {
+                      const iconBg = step.status === "done" ? EMERALD : step.status === "working" ? "#D97706" : "rgba(31,41,55,0.06)";
+                      const iconColor = step.status !== "pending" ? "#fff" : "rgba(31,41,55,0.3)";
+                      const iconContent = step.status === "done" ? "✓" : step.status === "working" ? "↻" : String(step.num);
+                      return (
+                        <div key={j} className="flex items-start gap-3 py-2">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                            style={{ background: iconBg, color: iconColor }}>
+                            {iconContent}
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-xs font-semibold" style={{ color: PURPLE }}>{step.agent}</div>
+                            <div className="text-sm" style={{ color: INK }}>{step.desc}</div>
+                            <div className="text-xs font-medium mt-0.5" style={{
+                              color: step.status === "done" ? EMERALD : step.status === "working" ? "#D97706" : "rgba(31,41,55,0.35)"
+                            }}>
+                              {step.status === "done" ? "✅ Listo" : step.status === "working" ? "🔄 Trabajando" : "⏳ Pendiente"}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
             </motion.div>
