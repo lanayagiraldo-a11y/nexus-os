@@ -105,10 +105,11 @@ export async function parseUpload(buffer: ArrayBuffer, filename: string): Promis
     return r.value;
   }
   if (lower.endsWith(".pdf")) {
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
-    const r = await parser.getText();
-    return r.text;
+    // unpdf: pensado para serverless (Node/Vercel), sin dependencias del DOM.
+    const { extractText, getDocumentProxy } = await import("unpdf");
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    const { text } = await extractText(pdf, { mergePages: true });
+    return Array.isArray(text) ? text.join("\n") : text;
   }
   const text = new TextDecoder("utf-8", { fatal: false }).decode(buffer);
   if (lower.endsWith(".html") || lower.endsWith(".htm")) return htmlToText(text);
