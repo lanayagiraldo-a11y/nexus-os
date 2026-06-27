@@ -7,7 +7,8 @@ import Sidebar from"@/components/Sidebar";
 import ActivityFeed from"@/components/ActivityFeed";
 import CommandPalette from"@/components/CommandPalette";
 import AgentFleet from"@/components/AgentFleet";
-import MissionControl from"@/components/MissionControl";
+import MissionControl from "@/components/MissionControl";
+import MissionControlHub from "@/components/MissionControlHub";
 import AgentChatPage from"@/components/AgentChatPage";
 import TodayView from"@/components/TodayView";
 import GoalsView from"@/components/GoalsView";
@@ -79,7 +80,7 @@ export default function NexusOS(){
               <Sidebar activeView={activeView} onViewChange={setActiveView}/>
               <main className="flex flex-1 overflow-hidden" style={{minWidth:0}}>
                 <AnimatePresence mode="wait">
-                  {activeView==="dashboard"&&<motion.div key="mission-control" initial={false} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:0.2}} className="flex-1 overflow-hidden"><MissionControl onOpenAgent={id=>setActiveView(`agent-${id}`)} onNavigate={setActiveView}/></motion.div>}
+                  {activeView==="dashboard"&&<motion.div key="mission-control" initial={false} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:0.2}} className="flex-1 overflow-hidden"><MissionControlHub/></motion.div>}
                   {activeView==="orchestrator"&&<motion.div key="orchestrator" initial={false} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:0.2}} className="flex-1 overflow-hidden"><OrchestratorView/></motion.div>}
                   {activeView==="today"&&<motion.div key="today" initial={false} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:0.2}} className="flex-1 overflow-hidden"><TodayView/></motion.div>}
                   {isAgentChat&&<motion.div key={activeView} initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-20}} transition={{duration:0.25,ease:[0.22,1,0.36,1]}} className="flex-1 overflow-hidden"><AgentChatPage provider={agentId!} onBack={()=>setActiveView("dashboard")}/></motion.div>}
