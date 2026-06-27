@@ -95,6 +95,15 @@ async function bufferToReadable(buf: ArrayBuffer, contentType: string, url?: str
   return contentType.includes("text/html") ? htmlToText(text) : text;
 }
 
+/** Parsea un archivo subido (xlsx/csv/txt/json/md/html) a texto legible para el agente. */
+export async function parseUpload(buffer: ArrayBuffer, filename: string): Promise<string> {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) return xlsxToText(buffer);
+  const text = new TextDecoder("utf-8", { fatal: false }).decode(buffer);
+  if (lower.endsWith(".html") || lower.endsWith(".htm")) return htmlToText(text);
+  return text; // csv, tsv, txt, json, md, etc.
+}
+
 async function fetchUrlSource(rawUrl: string): Promise<SourceResult> {
   const type = "url";
   try {

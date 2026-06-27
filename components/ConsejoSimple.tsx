@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PURPLE = "#4C1D95";
@@ -13,6 +13,22 @@ export default function ConsejoSimple() {
   const [step, setStep] = useState<Step>("describe");
   const [mission, setMission] = useState("");
   const [showDemo, setShowDemo] = useState(false);
+  const [attach, setAttach] = useState<{ name: string; text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData(); fd.append("file", file);
+      const d = await (await fetch("/api/upload", { method: "POST", body: fd })).json();
+      if (d.text !== undefined) setAttach({ name: d.name, text: d.text });
+      else alert(`No pude leer el archivo: ${d.error || "error"}`);
+    } catch (e) { alert(`Error: ${e instanceof Error ? e.message : String(e)}`); }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const steps = [
     { id: "describe" as Step, label: "Describir", done: step !== "describe" },
@@ -38,7 +54,7 @@ export default function ConsejoSimple() {
           body: JSON.stringify({
             action: "create-issue",
             title: `[agent-instructions][${item.agent.toLowerCase()}][task] ${planTitle}`,
-            body: `## Misión\n${mission}\n\n## Asignado a\n${item.agent}\n\n## Descripción\n${item.desc}\n\n## Contexto\nGenerado desde Nexus OS - Mission Control`,
+            body: `## Misión\n${mission}\n\n## Asignado a\n${item.agent}\n\n## Descripción\n${item.desc}\n\n## Contexto\nGenerado desde Nexus OS - Mission Control${attach ? `\n\n## 📎 Archivo adjunto: ${attach.name}\n${attach.text}` : ""}`,
             labels: ["agent-instructions", "agent-todo"],
           }),
         });
@@ -100,7 +116,20 @@ export default function ConsejoSimple() {
             placeholder="Ej: Necesito un informe de flota nueva de La Carolina con KPIs de rendimiento, comparativa contra el mes anterior y recomendaciones operativas para la reunión con John y Edith."
             rows={6} className="w-full rounded-xl p-4 text-sm resize-none outline-none"
             style={{ background: "rgba(247,239,226,0.9)", border: "1px solid rgba(76,29,149,0.12)", color: INK, fontFamily: "'Outfit', sans-serif" }} />
-          <div className="flex justify-end mt-3">
+          {attach && (
+            <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg text-xs w-fit" style={{ background: "rgba(76,29,149,0.08)", color: PURPLE }}>
+              📎 {attach.name} <span style={{ opacity: 0.6 }}>({attach.text.length} caracteres)</span>
+              <button onClick={() => setAttach(null)} className="ml-1" style={{ color: PURPLE }}>✕</button>
+            </div>
+          )}
+          <div className="flex justify-between items-center mt-3">
+            <div>
+              <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv,.tsv,.txt,.json,.md,.html" className="hidden" onChange={e => onFile(e.target.files?.[0])} />
+              <button onClick={() => fileRef.current?.click()} disabled={uploading}
+                className="px-3 py-2 rounded-xl text-xs font-bold cursor-pointer" style={{ background: "rgba(76,29,149,0.06)", color: PURPLE, border: `1px solid ${PURPLE}22` }}>
+                {uploading ? "⏳ Leyendo…" : "📎 Adjuntar archivo"}
+              </button>
+            </div>
             <button onClick={handleSend} disabled={!mission.trim()}
               className="px-5 py-2.5 rounded-xl text-sm font-bold border-none cursor-pointer"
               style={{ background: mission.trim() ? PURPLE : "rgba(76,29,149,0.1)", color: mission.trim() ? PARCHMENT : "rgba(31,41,55,0.3)" }}>

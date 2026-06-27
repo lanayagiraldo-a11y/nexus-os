@@ -43,6 +43,26 @@ export default function MissionControlHub() {
   const [activeTab, setActiveTab] = useState<TabId>("chat");
   const [empresas, setEmpresas] = useState<EmpresaLite[]>([]);
   const [empresaSel, setEmpresaSel] = useState<string>("");
+  const [attach, setAttach] = useState<{ name: string; text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const resp = await fetch("/api/upload", { method: "POST", body: fd });
+      const d = await resp.json();
+      if (d.text !== undefined) setAttach({ name: d.name, text: d.text });
+      else setMessages(prev => [...prev, { id: Date.now(), role: "agent", agent: "Sistema", agentLabel: "📎 Archivo", text: `No pude leer el archivo: ${d.error || "error"}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { id: Date.now(), role: "agent", agent: "Sistema", agentLabel: "📎 Archivo", text: `Error subiendo: ${e instanceof Error ? e.message : String(e)}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+    }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   useEffect(() => {
     fetch("/api/empresas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "list" }) })
@@ -142,10 +162,12 @@ export default function MissionControlHub() {
       else {
         const empresaNombre = empresas.find((e) => e.id === empresaSel)?.nombre;
         const tag = empresaNombre ? `🏢 ${empresaNombre} · ` : "";
+        const msgWithFile = attach ? `${text}\n\n---\n📎 Archivo adjunto "${attach.name}":\n${attach.text}` : text;
+        setAttach(null);
         const resp = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ provider: "hermes", message: text, empresa: empresaSel || undefined }),
+          body: JSON.stringify({ provider: "hermes", message: msgWithFile, empresa: empresaSel || undefined }),
         });
         if (!resp.ok || !resp.body) {
           const e = await resp.json().catch(() => ({}));
@@ -202,17 +224,18 @@ export default function MissionControlHub() {
     const text = input.trim();
     if (!text) return;
     const empresaNombre = empresas.find(e => e.id === empresaSel)?.nombre;
-    setInput("");
+    const body = attach ? `${text}\n\n---\n📎 Archivo adjunto "${attach.name}":\n${attach.text}` : text;
+    setInput(""); setAttach(null);
     try {
       const resp = await fetch("/api/github", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "create-issue", title: text.slice(0, 70), body: text, empresa: empresaSel || undefined }),
+        body: JSON.stringify({ action: "create-issue", title: text.slice(0, 70), body, empresa: empresaSel || undefined }),
       });
       const d = await resp.json();
       setMessages(prev => [...prev, {
         id: Date.now(), role: "agent", agent: "Cola", agentLabel: "🗂️ Enviado a la Cola",
-        text: d.issue ? `Petición #${d.issue.number} enviada a la cola${empresaNombre ? ` (${empresaNombre})` : ""}. Ábrela en la pestaña 🗂️ Cola para procesarla.` : `No se pudo crear: ${d.error || "error"}`,
+        text: d.issue ? `Petición #${d.issue.number} enviada a la cola${empresaNombre ? ` (${empresaNombre})` : ""}${attach ? " con el archivo adjunto" : ""}. Ábrela en la pestaña 🗂️ Cola para procesarla.` : `No se pudo crear: ${d.error || "error"}`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }]);
     } catch (e) {
@@ -362,7 +385,18 @@ export default function MissionControlHub() {
                 <div ref={chatEndRef} />
               </div>
 
+              {attach && (
+                <div className="flex items-center gap-2 mb-2 px-3 py-1.5 rounded-lg text-xs w-fit" style={{ background: "rgba(76,29,149,0.08)", color: PURPLE }}>
+                  📎 {attach.name} <span style={{ opacity: 0.6 }}>({attach.text.length} caracteres leídos)</span>
+                  <button onClick={() => setAttach(null)} className="ml-1" style={{ color: PURPLE }}>✕</button>
+                </div>
+              )}
               <div className="flex gap-2 pt-3 flex-shrink-0 border-t" style={{ borderColor: "rgba(76,29,149,0.06)" }}>
+                <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv,.tsv,.txt,.json,.md,.html" className="hidden"
+                  onChange={e => onFile(e.target.files?.[0])} />
+                <button onClick={() => fileRef.current?.click()} disabled={uploading} title="Adjuntar archivo como fuente"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg cursor-pointer flex-shrink-0"
+                  style={{ background: "rgba(247,239,226,0.9)", border: "1px solid rgba(76,29,149,0.1)", color: PURPLE }}>{uploading ? "⏳" : "📎"}</button>
                 <input value={input} onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleSend()}
                   placeholder="Escribe lo que necesites…"
