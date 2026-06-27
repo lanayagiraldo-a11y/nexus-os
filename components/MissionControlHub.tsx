@@ -51,23 +51,51 @@ export default function MissionControlHub() {
   const [agentCounts] = useState({ active: 4, total: 7 });
 
   // Workflow state
-  const workflows = [
+  const [workflows, setWorkflows] = useState([
     { title: "📋 Análisis competidores Taqwa Team", steps: [
-      { num: 1, agent: "Perplexity", desc: "Investigación con fuentes", status: "done" as const },
-      { num: 2, agent: "Hermes", desc: "Consolidar PDF final", status: "working" as const },
+      { num: 1, agent: "Perplexity", desc: "Investigación con fuentes", status: "done" },
+      { num: 2, agent: "Hermes", desc: "Consolidar PDF final", status: "working" },
     ]},
-    { title: "📋 Propuesta Portal de Soledad", steps: [
-      { num: 1, agent: "Claude", desc: "Análisis financiero", status: "done" as const },
-      { num: 2, agent: "Gemini", desc: "Validación demanda", status: "done" as const },
-      { num: 3, agent: "ChatGPT", desc: "Campaña lanzamiento", status: "done" as const },
-      { num: 4, agent: "Hermes", desc: "Síntesis y revisión", status: "working" as const },
-    ]},
-    { title: "📋 Campaña La Carolina", steps: [
-      { num: 1, agent: "Gemini", desc: "Brief segmentación", status: "done" as const },
-      { num: 2, agent: "ElevenLabs", desc: "Locución spot", status: "working" as const },
-      { num: 3, agent: "Image Gen", desc: "Visuales redes", status: "pending" as const },
-    ]},
-  ];
+  ]);
+  const [loadingIssues, setLoadingIssues] = useState(false);
+
+  // Fetch real issues from ia-masters-os
+  useEffect(() => {
+    const fetchIssues = async () => {
+      if (activeTab !== "workflow") return;
+      setLoadingIssues(true);
+      try {
+        const resp = await fetch("/api/github", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "list-issues" }),
+        });
+        const data = await resp.json();
+        if (data.issues && data.issues.length > 0) {
+          const grouped = data.issues.reduce((acc: any[], issue: any) => {
+            const label = issue.labels.find((l: string) => ["agent-todo","agent-working","agent-review","agent-done"].includes(l)) || "agent-todo";
+            const status = label === "agent-done" ? "done" : "working";
+            const agentName = issue.title.match(/\[(hermes|claude|codex|gemini|deepseek|perplexity|manus)\]/i);
+            const agent = agentName ? agentName[1].charAt(0).toUpperCase() + agentName[1].slice(1) : "Hermes";
+            if (!acc.length || acc[acc.length-1].steps.some((s: any) => s.status !== "done")) {
+              acc.push({ title: `📋 #${issue.number} ${issue.title.replace(/\[.*?\]/g, '').trim().slice(0, 50)}`, steps: [] });
+            }
+            const last = acc[acc.length-1];
+            last.steps.push({ num: last.steps.length + 1, agent, desc: issue.title.slice(0, 60), status });
+            return acc;
+          }, []);
+          if (grouped.length > 0) setWorkflows(grouped.slice(0, 5));
+        }
+      } catch (e) {
+        console.error("Failed to fetch issues:", e);
+      } finally {
+        setLoadingIssues(false);
+      }
+    };
+    fetchIssues();
+    const interval = setInterval(fetchIssues, 30000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 

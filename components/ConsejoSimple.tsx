@@ -25,9 +25,27 @@ export default function ConsejoSimple() {
     setStep("plan");
   };
 
-  const handleExecute = () => {
+  const handleExecute = async () => {
     setStep("execute");
     setShowDemo(true);
+    // Create real issues in ia-masters-os
+    try {
+      const planTitle = mission.split('.')[0].slice(0, 60);
+      for (const item of planItems) {
+        await fetch("/api/github", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "create-issue",
+            title: `[agent-instructions][${item.agent.toLowerCase()}][task] ${planTitle}`,
+            body: `## Misión\n${mission}\n\n## Asignado a\n${item.agent}\n\n## Descripción\n${item.desc}\n\n## Contexto\nGenerado desde Nexus OS - Mission Control`,
+            labels: ["agent-instructions", "agent-todo"],
+          }),
+        });
+      }
+    } catch (e) {
+      console.error("Failed to create issues:", e);
+    }
   };
 
   const planItems = [
