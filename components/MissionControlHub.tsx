@@ -198,6 +198,28 @@ export default function MissionControlHub() {
     }
   };
 
+  const sendToQueue = async () => {
+    const text = input.trim();
+    if (!text) return;
+    const empresaNombre = empresas.find(e => e.id === empresaSel)?.nombre;
+    setInput("");
+    try {
+      const resp = await fetch("/api/github", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "create-issue", title: text.slice(0, 70), body: text, empresa: empresaSel || undefined }),
+      });
+      const d = await resp.json();
+      setMessages(prev => [...prev, {
+        id: Date.now(), role: "agent", agent: "Cola", agentLabel: "🗂️ Enviado a la Cola",
+        text: d.issue ? `Petición #${d.issue.number} enviada a la cola${empresaNombre ? ` (${empresaNombre})` : ""}. Ábrela en la pestaña 🗂️ Cola para procesarla.` : `No se pudo crear: ${d.error || "error"}`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { id: Date.now(), role: "agent", agent: "Cola", agentLabel: "🗂️ Cola", text: `Error: ${e instanceof Error ? e.message : String(e)}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+    }
+  };
+
   const statusColor = (status: string) => {
     switch(status) {
       case "Libre": case "Listo": return "#047857";
@@ -347,7 +369,10 @@ export default function MissionControlHub() {
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm outline-none"
                   style={{ background: "rgba(247,239,226,0.9)", border: "1px solid rgba(76,29,149,0.1)", color: INK }}
                 />
-                <button onClick={handleSend}
+                <button onClick={sendToQueue} title="Enviar a la cola (Open Engine)"
+                  className="px-3 h-10 rounded-xl flex items-center justify-center text-xs font-bold cursor-pointer flex-shrink-0 whitespace-nowrap"
+                  style={{ background: "rgba(76,29,149,0.08)", color: PURPLE, border: `1px solid ${PURPLE}33` }}>🗂️ a la cola</button>
+                <button onClick={handleSend} title="Responder en el chat"
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-lg cursor-pointer border-none flex-shrink-0"
                   style={{ background: PURPLE, color: PARCHMENT }}>➤</button>
               </div>

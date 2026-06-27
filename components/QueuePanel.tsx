@@ -43,15 +43,6 @@ export default function QueuePanel() {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [newTitle, setNewTitle] = useState("");
-  const [newBody, setNewBody] = useState("");
-  const [empresas, setEmpresas] = useState<{ id: string; nombre: string; sources: unknown[] }[]>([]);
-  const [empresaSel, setEmpresaSel] = useState("");
-
-  useEffect(() => {
-    fetch("/api/empresas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "list" }) })
-      .then((r) => r.json()).then((d) => { if (Array.isArray(d.empresas)) setEmpresas(d.empresas); }).catch(() => {});
-  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,14 +70,6 @@ export default function QueuePanel() {
     setBusy(null); load();
   };
 
-  const create = async () => {
-    if (!newTitle.trim()) return;
-    setBusy("create");
-    const r = await api({ action: "create-issue", title: newTitle.trim(), body: newBody.trim(), empresa: empresaSel || undefined });
-    flash(r.issue ? `Creada #${r.issue.number}` : (r.error || "Error"));
-    setNewTitle(""); setNewBody(""); setBusy(null); load();
-  };
-
   return (
     <div className="absolute inset-0 overflow-y-auto p-4">
       {/* Barra superior */}
@@ -104,24 +87,8 @@ export default function QueuePanel() {
 
       {toast && <div className="mb-3 text-xs px-3 py-2 rounded-lg" style={{ background: "rgba(76,29,149,0.08)", color: PURPLE }}>{toast}</div>}
 
-      {/* Nueva petición */}
-      <div className="mb-4 rounded-xl p-3" style={{ background: "rgba(247,239,226,0.92)", border: "1px solid rgba(76,29,149,0.06)" }}>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold" style={{ color: PURPLE }}>➕ Nueva petición</span>
-          <select value={empresaSel} onChange={(e) => setEmpresaSel(e.target.value)} className="text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"
-            style={{ border: `1px solid ${empresaSel ? PURPLE : "rgba(31,41,55,0.12)"}`, color: empresaSel ? PURPLE : INK, fontWeight: 600 }}>
-            <option value="">🏢 Sin empresa</option>
-            {empresas.map((e) => <option key={e.id} value={e.id}>{e.nombre}</option>)}
-          </select>
-        </div>
-        <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Título (ej: [hermes] Reporte semanal La Carolina)"
-          className="w-full text-sm px-2.5 py-1.5 rounded-lg mb-2 outline-none" style={{ border: "1px solid rgba(31,41,55,0.12)", color: INK }} />
-        <textarea value={newBody} onChange={(e) => setNewBody(e.target.value)} rows={2}
-          placeholder="Detalle. Puedes añadir fuentes: @source: supabase table=viajes limit=20"
-          className="w-full text-sm px-2.5 py-1.5 rounded-lg mb-2 outline-none resize-none" style={{ border: "1px solid rgba(31,41,55,0.12)", color: INK }} />
-        <button onClick={create} disabled={busy === "create" || !newTitle.trim()} className="text-xs px-3 py-1.5 rounded-lg font-semibold text-white" style={{ background: PURPLE, opacity: !newTitle.trim() ? 0.4 : 1 }}>
-          Crear en cola
-        </button>
+      <div className="mb-3 text-xs px-3 py-2 rounded-lg" style={{ background: "rgba(31,41,55,0.04)", color: "rgba(31,41,55,0.55)" }}>
+        Las peticiones se crean desde <b>💬 Chat</b> o <b>🧠 Consejo</b>. Aquí ves la cola, quién la trabaja y la apruebas.
       </div>
 
       {/* Columnas por estado */}
