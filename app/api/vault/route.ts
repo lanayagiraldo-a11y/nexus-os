@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -14,6 +15,9 @@ const FOLDERS: Record<string, { label: string; p: string }> = {
 };
 
 export async function GET() {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   const ctx = [
     { id: "none", label: "Sin contexto", hint: "Solo la misión", available: true },
     { id: "daily", label: "Daily note de hoy", hint: "Nota diaria", available: true },
@@ -27,6 +31,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   let contextId = "";
   try {
     const body = await req.json();

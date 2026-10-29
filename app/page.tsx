@@ -76,6 +76,9 @@ export default function NexusOS(){
         {!booting&&(
           <motion.div initial={false} animate={{opacity:1}} transition={{duration:0.5}} className="relative z-10 flex flex-col h-full">
             <Header onOpenCommand={()=>setCommandOpen(true)}/>
+            <div role="status" className="px-4 py-3 text-sm text-center bg-amber-100 text-amber-950 border-b border-amber-300">
+              Las funciones privadas están temporalmente pausadas. Es necesario configurar un inicio de sesión autorizado para reactivarlas.
+            </div>
             <div className="flex flex-1 overflow-hidden">
               <Sidebar activeView={activeView} onViewChange={setActiveView}/>
               <main className="flex flex-1 overflow-hidden" style={{minWidth:0}}>

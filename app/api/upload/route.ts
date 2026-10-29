@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import { parseUpload } from "@/lib/sources";
 
@@ -12,6 +13,9 @@ const ALLOWED = [".xlsx", ".xls", ".docx", ".pdf", ".csv", ".tsv", ".txt", ".jso
  * multipart/form-data con campo "file".
  */
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   try {
     const form = await req.formData();
     const file = form.get("file");

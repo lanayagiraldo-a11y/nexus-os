@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextResponse } from "next/server";
 import { PROVIDERS } from "@/lib/providers";
 import { getHermesApiKey, getHermesBaseUrl } from "@/lib/nexusConfig";
@@ -59,6 +60,9 @@ async function pingClaude(key: string): Promise<{ ok: boolean; latency: number; 
 }
 
 export async function GET() {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   const hermesBaseUrl = getHermesBaseUrl().replace(/\/$/, "");
   const results: ProviderHealth[] = await Promise.all([
     (async (): Promise<ProviderHealth> => {

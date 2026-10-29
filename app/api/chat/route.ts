@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest } from "next/server";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -241,6 +242,9 @@ function normalizeMessages(payload: { messages?: ChatMessage[]; message?: string
 }
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   const payload = await req.json();
   const { provider } = payload;
   const messages = normalizeMessages(payload);

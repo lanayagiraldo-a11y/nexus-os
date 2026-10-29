@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import {
   addReceipt,
@@ -21,6 +22,9 @@ function isAgentState(v: unknown): v is AgentState {
 }
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   try {
     const payload = await req.json();
     const action = payload.action as string;

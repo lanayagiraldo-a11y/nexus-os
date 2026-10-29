@@ -45,3 +45,11 @@ proyectos/
 | 11:30 | Hermes | Cita Dr. Pombo agendada (martes 30, 4pm, Cra 45 No. 95-110) | ✅ | Google Calendar |
 | 12:30 | Hermes | Dashboard flota nueva — gráficas rotas reparadas (SVG) + redeploy | ✅ | nexus-os-liliana.netlify.app |
 | — | — | — | — | — |
+
+### 2026-10-29 13:52 UTC — Codex
+
+- Tarea: contención temporal de las APIs privadas y actualización de dependencias de seguridad.
+- Estado: ✅ parche y verificación local completados; 🔄 despliegue y configuración de inicio de sesión pendientes.
+- Archivos: `lib/apiAccess.ts`, `app/api/**/route.ts`, aviso en `app/page.tsx`, `package.json`, `package-lock.json`, `scripts/test-access.mjs`, `scripts/test-block-outbound.mjs`, `docs/security-access.md`.
+- Verificación: build de producción y TypeScript correctos; 30 solicitudes anónimas/con identidad falsa denegadas en 15 handlers, sin llamadas externas ni escritura al vault; lectura/escritura de muestras XLSX/XLS correcta con SheetJS 0.20.3.
+- Las APIs devuelven 503 hasta integrar sesiones verificadas y autorización del propietario. No se crearon credenciales, accesos alternos ni proveedor OAuth.

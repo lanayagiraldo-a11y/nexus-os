@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import { loadEmpresas, saveEmpresas, getEmpresa, empresaSourcesBody, slug, type Empresa } from "@/lib/empresas";
 import { resolveSources } from "@/lib/sources";
@@ -5,6 +6,9 @@ import { resolveSources } from "@/lib/sources";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   try {
     const p = await req.json();
     const action = p.action as string;

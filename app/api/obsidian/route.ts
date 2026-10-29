@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -90,6 +91,9 @@ interface DailyTask {
 }
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   const body = await req.json();
   const { type } = body;
 
@@ -331,6 +335,9 @@ function parseDailySummary(content: string) {
 }
 
 export async function GET(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   const type = req.nextUrl.searchParams.get("type");
   try {
     const vaultPath = getVaultPath();
