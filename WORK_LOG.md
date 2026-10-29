@@ -53,3 +53,4 @@ proyectos/
 - Archivos: `lib/apiAccess.ts`, `app/api/**/route.ts`, aviso en `app/page.tsx`, `package.json`, `package-lock.json`, `scripts/test-access.mjs`, `scripts/test-block-outbound.mjs`, `docs/security-access.md`.
 - Verificación: build de producción y TypeScript correctos; 30 solicitudes anónimas/con identidad falsa denegadas en 15 handlers, sin llamadas externas ni escritura al vault; lectura/escritura de muestras XLSX/XLS correcta con SheetJS 0.20.3.
 - Las APIs devuelven 503 hasta integrar sesiones verificadas y autorización del propietario. No se crearon credenciales, accesos alternos ni proveedor OAuth.
+- Verificación adicional: se actualizaron dependencias transitivas compatibles del parser y herramientas; el resultado final de auditoría queda documentado en el PR.

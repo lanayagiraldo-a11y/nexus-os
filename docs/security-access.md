@@ -56,6 +56,9 @@ identity or use automation bypass tokens as a login mechanism.
 - Next.js and eslint-config-next: 16.4.3 (October security minimum: 16.4.1).
 - React and react-dom: 19.2.9.
 - Next's resolved sharp: 0.35.5.
+- Compatible transitive fixes: xmldom 0.8.15, zod 4.6.7, source-map-js 1.2.2,
+  baseline-browser-mapping 2.11.34, brace-expansion 1.1.21/5.0.12,
+  browserslist 4.29.5, and js-yaml 4.3.2.
 - SheetJS: 0.20.3 from its official CDN, pinned in the lockfile with integrity.
   The npm registry's `xlsx` 0.18.5 is not a maintained update source.
 
