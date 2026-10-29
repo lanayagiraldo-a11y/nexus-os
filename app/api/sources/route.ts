@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import { parseSourceDirectives, resolveOneSource, resolveSources, type SourceDirective } from "@/lib/sources";
 
@@ -12,6 +13,9 @@ export const runtime = "nodejs";
  *  - { action: "status" }  -> qué conectores están configurados
  */
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   try {
     const payload = await req.json();
     const action = payload.action as string;

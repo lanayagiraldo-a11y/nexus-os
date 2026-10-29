@@ -1,3 +1,4 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -262,6 +263,9 @@ async function buildMissionWithContext(mission: string, context?: MissionContext
 }
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   try {
     const body = await req.json();
     const mission = typeof body.mission === "string" ? body.mission : "";

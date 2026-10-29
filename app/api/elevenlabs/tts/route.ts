@@ -1,8 +1,12 @@
+import { getApiAccessDenial } from "@/lib/apiAccess";
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
 export async function POST(req: NextRequest) {
+  const accessDenial = getApiAccessDenial();
+  if (accessDenial) return accessDenial;
+
   try {
     const { text, voice } = await req.json();
     if (!text?.trim()) return NextResponse.json({ error: "Campo text requerido" }, { status: 400 });
